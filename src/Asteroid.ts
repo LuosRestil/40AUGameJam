@@ -1,4 +1,5 @@
 import { Game } from "./Game";
+import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
 import { Vector2 } from "./Vector2";
 
@@ -7,7 +8,7 @@ class Asteroid implements GameObject {
   velocity: Vector2;
   acceleration: Vector2;
   rotation: number;
-  game: Game;
+  gameContext: GameContext;
 
   constructor(
     game: Game,
@@ -16,7 +17,7 @@ class Asteroid implements GameObject {
     acceleration: Vector2,
     rotation: number
   ) {
-    this.game = game;
+    this.gameContext = GameContext.getInstance();
     this.position = position;
     this.velocity = velocity;
     this.acceleration = acceleration;

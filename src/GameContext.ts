@@ -4,7 +4,6 @@ export class GameContext {
   private _ctx?: CanvasRenderingContext2D;
   userInput = {
     up: false,
-    down: false,
     left: false,
     right: false
   };
@@ -16,24 +15,24 @@ export class GameContext {
     return GameContext.instance;
   }
 
-  getInstance(): GameContext {
+  static getInstance(): GameContext {
     return GameContext.instance;
   }
 
-  getDeltaTime(): number {
+  get deltaTime(): number {
     return this._deltaTime;
   }
 
-  setDeltaTime(deltaTime: number): void {
+  set deltaTime(deltaTime: number) {
     this._deltaTime = deltaTime;
   }
 
-  getCtx(): CanvasRenderingContext2D {
+  get ctx(): CanvasRenderingContext2D {
     if (!this._ctx) throw Error("You forgot to set the canvas context in the GameContext, dummy");
     return this._ctx;
   }
 
-  setCtx(ctx: CanvasRenderingContext2D) {
+  set ctx(ctx: CanvasRenderingContext2D) {
     this._ctx = ctx;
   }
 }

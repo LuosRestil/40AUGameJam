@@ -1,42 +1,49 @@
+import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
 import { Ship } from "./Ship";
 import { Vector2 } from "./Vector2";
 
 export class Game {
-  ctx: CanvasRenderingContext2D;
-  deltaTime: number;
+  gameContext: GameContext;
   lastTime: number;
   gameObjects: GameObject[];
-  ship: Ship;
 
-  constructor(ctx: CanvasRenderingContext2D) {
-    this.ctx = ctx;
-    this.deltaTime = 0;
+  constructor() {
+    this.gameContext = GameContext.getInstance();
     this.lastTime = 0;
     this.gameObjects = [];
-    this.ship = new Ship(
-      this, 
-      new Vector2(ctx.canvas.width/2,
-      ctx.canvas.height/2),
+    const ship = new Ship(
+      new Vector2(
+        this.gameContext.ctx.canvas.width / 2,
+        this.gameContext.ctx.canvas.height / 2
+      ),
       new Vector2(0, 0),
       new Vector2(0, 0),
       0
     );
+    this.gameObjects.push(ship);
   }
-  
+
   run() {
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.gameContext.ctx.fillStyle = "black";
+    this.gameContext.ctx.fillRect(
+      0,
+      0,
+      this.gameContext.ctx.canvas.width,
+      this.gameContext.ctx.canvas.height
+    );
     requestAnimationFrame(this.animate);
   }
 
   private animate = (currentTime: number): void => {
-    this.deltaTime = currentTime - this.lastTime;
+    this.gameContext.deltaTime = currentTime - this.lastTime;
     this.lastTime = currentTime;
 
-    this.ship.update();
-    this.ship.draw();
+    for (let gameObject of this.gameObjects) {
+      gameObject.draw();
+      gameObject.update();
+    }
 
     requestAnimationFrame(this.animate);
-  }
+  };
 }

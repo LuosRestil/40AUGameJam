@@ -1,32 +1,42 @@
-import { Game } from "./Game";
+import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
 import { Vector2 } from "./Vector2";
 
 export class Ship implements GameObject {
-  game: Game;
+  gameContext: GameContext;
   position: Vector2;
   velocity: Vector2;
   acceleration: Vector2;
   rotation: number;
 
   constructor(
-    game: Game,
     position: Vector2,
     velocity: Vector2,
     acceleration: Vector2,
     rotation: number
   ) {
-    this.game = game;
     this.position = position;
     this.velocity = velocity;
     this.acceleration = acceleration;
     this.rotation = rotation;
+    this.gameContext = GameContext.getInstance();
   }
 
-  update() {}
+  update() {
+    if (this.gameContext.userInput.up) {
+      // move in direction we're facing
+      // fire thrusters
+    }
+    if (this.gameContext.userInput.left) {
+      // rotate left
+    }
+    if (this.gameContext.userInput.right) {
+      // rotate right
+    }
+  }
 
   draw() {
-    this.game.ctx.fillStyle = 'red';
-    this.game.ctx.fillRect(100, 100, 100, 100);
+    this.gameContext.ctx.fillStyle = 'red';
+    this.gameContext.ctx.fillRect(100, 100, 100, 100);
   }
 }
