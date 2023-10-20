@@ -12,26 +12,29 @@ gameContext.ctx = ctx;
 // user input
 document.addEventListener('keydown', (evt: KeyboardEvent) => {
   const key = evt.key;
-  if (key === 'UpArrow' || key === 'w') {
+  if (key === 'ArrowUp' || key === 'w') {
+    console.log('up');
     gameContext.userInput.up = true;
   }
-  if (key === 'LeftArrow' || key === 'a') {
+  if (key === 'ArrowLeft' || key === 'a') {
+    console.log('left');
     gameContext.userInput.left = true;
   }
-  if (key === 'RightArrow' || key === 's') {
+  if (key === 'ArrowRight' || key === 'd') {
+    console.log('right');
     gameContext.userInput.right = true;
   }
 });
 
 document.addEventListener('keyup', (evt: KeyboardEvent) => {
   const key = evt.key;
-  if (key === 'UpArrow' || key === 'w') {
+  if (key === 'ArrowUp' || key === 'w') {
     gameContext.userInput.up = false;
   }
-  if (key === 'LeftArrow' || key === 'a') {
+  if (key === 'ArrowLeft' || key === 'a') {
     gameContext.userInput.left = false;
   }
-  if (key === 'RightArrow' || key === 's') {
+  if (key === 'ArrowRight' || key === 'd') {
     gameContext.userInput.right = false;
   }
 });

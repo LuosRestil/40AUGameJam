@@ -39,6 +39,9 @@ export class Game {
     this.gameContext.deltaTime = currentTime - this.lastTime;
     this.lastTime = currentTime;
 
+    const ctx = this.gameContext.ctx;
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     for (let gameObject of this.gameObjects) {
       gameObject.draw();
       gameObject.update();

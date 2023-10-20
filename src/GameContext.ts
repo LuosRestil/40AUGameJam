@@ -8,14 +8,10 @@ export class GameContext {
     right: false
   };
 
-  private constructor() {
+  static getInstance(): GameContext {
     if (!GameContext.instance) {
       GameContext.instance = new GameContext();
     }
-    return GameContext.instance;
-  }
-
-  static getInstance(): GameContext {
     return GameContext.instance;
   }
 
