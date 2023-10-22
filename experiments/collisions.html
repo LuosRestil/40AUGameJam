@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Collisions</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas></canvas>
+    <script>
+      const canvas = document.querySelector("canvas");
+      canvas.width = document.body.clientWidth;
+      canvas.height = document.body.clientHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      class AABB {
+        constructor(x, y, w, h) {
+          this.x = x;
+          this.y = y;
+          this.w = w;
+          this.h = h;
+          this.color = null;
+        }
+
+        draw(ctx) {
+          ctx.strokeStyle = "white";
+          ctx.fillStyle = this.color ? this.color : "rgba(255, 0, 0, 0.3)";
+          ctx.strokeRect(
+            this.x - this.w / 2,
+            this.y - this.h / 2,
+            this.w,
+            this.h
+          );
+          ctx.fillRect(
+            this.x - this.w / 2,
+            this.y - this.h / 2,
+            this.w,
+            this.h
+          );
+        }
+
+        detectCollision(circle) {
+          const qx = clamp(circle.x, this.x - this.w / 2, this.x + this.w / 2);
+          const qy = clamp(
+            circle.y,
+            this.y - this.h / 2,
+            this.y + this.h / 2
+          );
+          drawPoint(qx, qy);
+          if (dist(qx, qy, circle.x, circle.y) <= circle.radius) {
+            return true;
+          }
+          return false;
+        }
+      }
+
+      class OBB {
+        constructor(x, y, w, h, angle) {
+          this.x = x;
+          this.y = y;
+          this.w = w;
+          this.h = h;
+          this.angle = 0;
+        }
+
+        draw(ctx) {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.angle);
+          ctx.strokeStyle = "white";
+          ctx.fillStyle = this.color ? this.color : "rgba(255, 0, 0, 0.3)";
+          ctx.strokeRect(
+            -this.w / 2,
+            -this.h / 2,
+            this.w,
+            this.h
+          );
+          ctx.fillRect(
+            -this.w / 2,
+            -this.h / 2,
+            this.w,
+            this.h
+          );
+          ctx.fillStyle = 'white';
+          ctx.beginPath();
+          ctx.moveTo(this.w/2 + 20, 0);
+          ctx.lineTo(this.w/2, -20);
+          ctx.lineTo(this.w/2, 20);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        detectCollision(circle) {
+          const D = subtract([circle.x, circle.y], [this.x, this.y]);
+          const U = [Math.cos(this.angle), Math.sin(this.angle)];
+          const V = [-Math.sin(this.angle), Math.cos(this.angle)];
+          const projU = dot(D, U);
+          const projV = dot(D, V);
+          const circlePrimeX = clamp(projU, -this.w / 2, this.w / 2);
+          const circlePrimeY = clamp(projV, -this.h / 2, this.h / 2);
+          const qx = this.x + circlePrimeX * U[0] + circlePrimeY * V[0];
+          const qy = this.y + circlePrimeX * U[1] + circlePrimeY * V[1];
+          drawPoint(qx, qy);
+          if (dist(qx, qy, circle.x, circle.y) <= circle.radius) {
+            return true;
+          }
+          return false;
+        }
+      }
+
+      class Circle {
+        constructor(x, y, radius) {
+          this.x = x;
+          this.y = y;
+          this.radius = radius;
+          this.color = null;
+        }
+
+        draw(ctx) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.strokeStyle = "white";
+          ctx.fillStyle = this.color ? this.color : "rgba(0, 0, 255, 0.3)";
+          ctx.stroke();
+          ctx.fill();
+        }
+      }
+
+      const circle = new Circle(200, 200, 100);
+      const aabb = new AABB(500, 500, 200, 200);
+      const obb = new OBB(800, 300, 200, 200);
+
+      let dragging = false;
+
+      document.addEventListener("mousedown", (evt) => {
+        circle.x = evt.offsetX;
+        circle.y = evt.offsetY;
+        dragging = true;
+      });
+
+      document.addEventListener("mouseup", () => {
+        dragging = false;
+      });
+
+      document.addEventListener("mousemove", (evt) => {
+        // if (dragging) {
+          circle.x = evt.offsetX;
+          circle.y = evt.offsetY;
+        // }
+      });
+
+      animate();
+
+      function animate() {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const aabbCollision = aabb.detectCollision(circle);
+        const obbCollision = obb.detectCollision(circle);
+        if (aabbCollision) {
+          aabb.color = 'deeppink';
+          circle.color = 'deeppink';
+        } else {
+          aabb.color = null;
+        }
+        if (obbCollision) {
+          obb.color = 'deeppink';
+          circle.color = 'deeppink';
+        } else {
+          obb.color = null;
+        }
+        if (!aabbCollision && !obbCollision) {
+          circle.color = null;
+        }
+        circle.draw(ctx);
+        aabb.draw(ctx);
+        obb.draw(ctx);
+        obb.angle += 0.01;
+
+        requestAnimationFrame(animate);
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(value, max));
+      }
+
+      function drawPoint(x, y) {
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, Math.PI * 2);
+        ctx.fillStyle = "yellow";
+        ctx.fill();
+      }
+
+      function dist(x1, y1, x2, y2) {
+        return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+      }
+
+
+      // vector stuff
+      function subtract(v1, v2) {
+        return [v1[0] - v2[0], v1[1] - v2[1]];
+      }
+
+      function getMag(v) {
+        return Math.sqrt(v[0] ** 2 + v[1] ** 2);
+      }
+
+      function normalize(v) {
+        const mag = getMag(v);
+        return [v[0]/mag, v[1]/mag];
+      }
+
+      function dot(v1, v2) {
+        return v1[0] * v2[0] + v1[1] * v2[1];
+      }
+    </script>
+  </body>
+</html>

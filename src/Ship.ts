@@ -1,8 +1,9 @@
+import { Asteroid } from "./Asteroid";
 import { BoundingBox } from "./BoundingBox";
 import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
 import { Vector2 } from "./Vector2";
-import { screenWrap } from "./utils";
+import { drawPoint, screenWrap } from "./utils";
 
 export class Ship implements GameObject {
   gameContext: GameContext;
@@ -56,6 +57,7 @@ export class Ship implements GameObject {
   draw() {
     const ctx = this.gameContext.ctx;
     ctx.save();
+
     ctx.translate(this.position.x, this.position.y);
     ctx.rotate(this.rotation);
     // body
@@ -84,8 +86,42 @@ export class Ship implements GameObject {
     ctx.arc(this.width / 4 + 6, -this.height / 4, 8, 0, Math.PI * 2);
     ctx.fillStyle = "black";
     ctx.fill();
+
     this.boundingBox.draw();
+
     ctx.restore();
+  }
+
+  collidesWith(circle: Asteroid): boolean {
+    // get closest point to circle
+    // transform circle center to local space of oriented bounding box
+    let dx = circle.position.x - this.position.x;
+    let dy = circle.position.y - this.position.y;
+    let localX = dx * Math.cos(this.rotation) - dy * Math.sin(this.rotation);
+    let localY = dx * Math.sin(this.rotation) + dy * Math.cos(this.rotation);
+    drawPoint(this.gameContext.ctx, new Vector2(this.position.x + localX, this.position.y + localY));
+    // CONFIRMED WORKING
+
+    return false;
+    // TODO NOT WORKING
+    // // clamp transformed position to ship bounds
+    // const halfWidth = this.width / 2;
+    // const halfHeight = this.height / 2;
+    // localX = Math.max(-halfWidth, Math.min(localX, halfWidth));
+    // localY = Math.max(-halfHeight, Math.min(localY, halfHeight));
+
+    // // transform closest point back to world space
+    // dx = localX * Math.cos(-this.rotation) - localY * (Math.sin(-this.rotation));
+    // dy = localX * Math.sin(-this.rotation) + localY * Math.cos(-this.rotation);
+    // const closestPoint = new Vector2(this.position.x + dx, this.position.y + dy);
+    // // draw closest point
+    // this.gameContext.ctx.arc(closestPoint.x, closestPoint.y, 5, 0, Math.PI*2);
+    // this.gameContext.ctx.fillStyle = 'yellow';
+    // this.gameContext.ctx.fill();
+
+    // const colliding = Vector2.distanceBetween(closestPoint, circle.position) < circle.radius;
+    // if (colliding) console.log("COLLIDING");
+    // return colliding;    
   }
 
   private applyPropulsionForce(): void {
