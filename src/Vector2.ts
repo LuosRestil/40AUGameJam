@@ -46,4 +46,12 @@ export class Vector2 {
     v.scale(length);
     return v;
   }
+
+  static distanceBetween(v1: Vector2, v2: Vector2) {
+    return Math.sqrt((v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2);
+  }
+
+  static scale(vector: Vector2, scalar: number): Vector2 {
+    return new Vector2(vector.x * scalar, vector.y * scalar);
+  }
 }

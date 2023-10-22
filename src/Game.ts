@@ -1,3 +1,4 @@
+import { Asteroid } from "./Asteroid";
 import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
 import { Ship } from "./Ship";
@@ -11,17 +12,15 @@ export class Game {
   constructor() {
     this.gameContext = GameContext.getInstance();
     this.lastTime = 0;
+    const ship = new Ship();
     this.gameObjects = [];
-    const ship = new Ship(
-      new Vector2(
-        this.gameContext.ctx.canvas.width / 2,
-        this.gameContext.ctx.canvas.height / 2
-      ),
-      new Vector2(0, 0),
-      new Vector2(0, 0),
-      0
-    );
     this.gameObjects.push(ship);
+    this.gameObjects.push(new Asteroid(
+      new Vector2(100, 100),
+      50,
+      new Vector2(100, 100),
+      0,
+    ));
   }
 
   run() {
@@ -32,11 +31,12 @@ export class Game {
       this.gameContext.ctx.canvas.width,
       this.gameContext.ctx.canvas.height
     );
+
     requestAnimationFrame(this.animate);
   }
 
   private animate = (currentTime: number): void => {
-    this.gameContext.deltaTime = currentTime - this.lastTime;
+    this.gameContext.deltaTimeSeconds = (currentTime - this.lastTime)/1000;
     this.lastTime = currentTime;
 
     const ctx = this.gameContext.ctx;

@@ -13,15 +13,12 @@ gameContext.ctx = ctx;
 document.addEventListener('keydown', (evt: KeyboardEvent) => {
   const key = evt.key;
   if (key === 'ArrowUp' || key === 'w') {
-    console.log('up');
     gameContext.userInput.up = true;
   }
   if (key === 'ArrowLeft' || key === 'a') {
-    console.log('left');
     gameContext.userInput.left = true;
   }
   if (key === 'ArrowRight' || key === 'd') {
-    console.log('right');
     gameContext.userInput.right = true;
   }
 });

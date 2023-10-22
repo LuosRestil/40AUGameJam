@@ -1,6 +1,6 @@
 export class GameContext {
   private static instance: GameContext;
-  private _deltaTime: number = 0;
+  private _deltaTimeSeconds: number = 0;
   private _ctx?: CanvasRenderingContext2D;
   userInput = {
     up: false,
@@ -15,12 +15,12 @@ export class GameContext {
     return GameContext.instance;
   }
 
-  get deltaTime(): number {
-    return this._deltaTime;
+  get deltaTimeSeconds(): number {
+    return this._deltaTimeSeconds;
   }
 
-  set deltaTime(deltaTime: number) {
-    this._deltaTime = deltaTime;
+  set deltaTimeSeconds(deltaTimeSeconds: number) {
+    this._deltaTimeSeconds = deltaTimeSeconds;
   }
 
   get ctx(): CanvasRenderingContext2D {
