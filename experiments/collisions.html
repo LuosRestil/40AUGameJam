@@ -74,7 +74,7 @@
           this.y = y;
           this.w = w;
           this.h = h;
-          this.angle = 0;
+          this.angle = Math.PI/4;
         }
 
         draw(ctx) {
@@ -105,9 +105,30 @@
         }
 
         detectCollision(circle) {
-          const D = subtract([circle.x, circle.y], [this.x, this.y]);
-          const U = [Math.cos(this.angle), Math.sin(this.angle)];
-          const V = [-Math.sin(this.angle), Math.cos(this.angle)];
+          const D = subtract([circle.x, circle.y], [this.x, this.y]);  // a vector pointing from obb to circle
+          const U = [Math.cos(this.angle), Math.sin(this.angle)];  // a unit vector representing the local x axis of the obb
+          const V = [-Math.sin(this.angle), Math.cos(this.angle)]; // a unit vector representing the local y axis of the obb
+
+          // draw U
+          // const startPointU = [obb.x, obb.y];
+          // const scaledU = scale(U, 100);
+          // const endPointU = add(startPointU, scaledU);
+          // ctx.beginPath();
+          // ctx.moveTo(startPointU[0], startPointU[1]);
+          // ctx.lineTo(endPointU[0], endPointU[1]);
+          // ctx.strokeStyle = 'red';
+          // ctx.stroke();
+
+          // draw V
+          // const startPointV = [obb.x, obb.y];
+          // const scaledV = scale(V, 100);
+          // const endPointV = add(startPointV, scaledV);
+          // ctx.beginPath();
+          // ctx.moveTo(startPointV[0], startPointV[1]);
+          // ctx.lineTo(endPointV[0], endPointV[1]);
+          // ctx.strokeStyle = 'dodgerblue';
+          // ctx.stroke();
+
           const projU = dot(D, U);
           const projV = dot(D, V);
           const circlePrimeX = clamp(projU, -this.w / 2, this.w / 2);
@@ -163,6 +184,21 @@
         // }
       });
 
+      const keys = {
+        right: false,
+        left: false,
+      }
+
+      document.addEventListener('keydown', (evt) => {
+        if (evt.key === 'ArrowRight') keys.right = true;
+        if (evt.key === 'ArrowLeft') keys.left = true;
+      });
+
+      document.addEventListener('keyup', (evt) => {
+        if (evt.key === 'ArrowRight') keys.right = false;
+        if (evt.key === 'ArrowLeft') keys.left = false;
+      });
+
       animate();
 
       function animate() {
@@ -189,7 +225,10 @@
         circle.draw(ctx);
         aabb.draw(ctx);
         obb.draw(ctx);
-        obb.angle += 0.01;
+
+        if (keys.right) obb.angle += 0.01;
+        if (keys.left) obb.angle -= 0.01;
+        // obb.angle += 0.01;
 
         requestAnimationFrame(animate);
       }
@@ -198,10 +237,10 @@
         return Math.max(min, Math.min(value, max));
       }
 
-      function drawPoint(x, y) {
+      function drawPoint(x, y, color = 'yellow') {
         ctx.beginPath();
         ctx.arc(x, y, 10, 0, Math.PI * 2);
-        ctx.fillStyle = "yellow";
+        ctx.fillStyle = color;
         ctx.fill();
       }
 
@@ -226,6 +265,14 @@
 
       function dot(v1, v2) {
         return v1[0] * v2[0] + v1[1] * v2[1];
+      }
+
+      function scale(v, factor) {
+        return [v[0] * factor, v[1] * factor];
+      }
+
+      function add(v1, v2) {
+        return [v1[0] + v2[0], v1[1] + v2[1]];
       }
     </script>
   </body>
