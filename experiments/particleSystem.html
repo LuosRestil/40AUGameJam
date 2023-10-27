@@ -23,7 +23,7 @@
     <canvas></canvas>
     <script>
       const colors = ["cyan", "magenta", "yellow", "lime", "red", "orange"];
-      const windMag = 100;
+      const windMag = 300;
 
       let mousePos = { x: 0, y: 0 };
 
@@ -126,6 +126,12 @@
 
           // get windForce
           // get angle between particle system and mouse
+          // const dx = mousePos.x - this.origin.x;
+          // const dy = mousePos.y - this.origin.y;
+          // const h = Math.sqrt(dx**2 + dy**2);
+          // const angle = Math.atan2(dy, dx);
+          // const windForce = {x: 0, y: 0};
+          // console.log(angle);
           const D = {x: this.origin.x - mousePos.x, y: this.origin.y - mousePos.y};
           // normalize and scale
           const mag = Math.sqrt(D.x**2 + D.y**2);
@@ -141,11 +147,11 @@
           this.particles.push(
             new Particle(
               { x: this.origin.x, y: this.origin.y },
-              { x: 0, y: 0 },
-              // {
-              //   x: this.minVel + Math.random() * (this.maxVel - this.minVel),
-              //   y: this.minVel + Math.random() * (this.maxVel - this.minVel),
-              // },
+              // { x: 0, y: 0 },
+              {
+                x: this.minVel + Math.random() * (this.maxVel - this.minVel),
+                y: this.minVel + Math.random() * (this.maxVel - this.minVel),
+              },
               5,
               "square",
               1000, // 1 second
