@@ -22,14 +22,10 @@
   <body>
     <canvas></canvas>
     <script>
-      const colors = [
-        'cyan',
-        'magenta',
-        'yellow',
-        'lime',
-        'red',
-        'orange',
-      ];
+      const colors = ["cyan", "magenta", "yellow", "lime", "red", "orange"];
+      const windMag = 100;
+
+      let mousePos = { x: 0, y: 0 };
 
       const canvas = document.querySelector("canvas");
       canvas.width = document.body.clientWidth;
@@ -37,11 +33,15 @@
       const ctx = canvas.getContext("2d");
 
       document.addEventListener("click", (evt) => {
-        generateParticleSystem({x: evt.offsetX, y: evt.offsetY});
+        generateParticleSystem({ x: evt.offsetX, y: evt.offsetY });
       });
 
       document.addEventListener("keydown", () => {
         console.log(particleSystems);
+      });
+
+      document.addEventListener("mousemove", (evt) => {
+        mousePos = { x: evt.offsetX, y: evt.offsetY };
       });
 
       const particleSystems = [];
@@ -49,7 +49,7 @@
       requestAnimationFrame(animate);
 
       function animate(timestamp) {
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         for (let ps of particleSystems) {
           ps.step(timestamp);
@@ -73,7 +73,7 @@
           this.velocity = velocity;
           this.lifetime = lifetime;
           this.active = true;
-          this.createdTime = createdTime
+          this.createdTime = createdTime;
           this.lastTime = createdTime;
           const randIdx = Math.floor(Math.random() * colors.length);
           this.color = colors[randIdx];
@@ -81,14 +81,17 @@
           this.shape = shape;
         }
 
-        run(timestamp) {
-          this.update(timestamp);
+        run(timestamp, windForce) {
+          this.update(timestamp, windForce);
           this.draw();
         }
 
-        update(timestamp) {
-          const deltaTimeSeconds = (timestamp - this.lastTime)/1000;
+        update(timestamp, windForce) {
+          const deltaTimeSeconds = (timestamp - this.lastTime) / 1000;
           this.lastTime = timestamp;
+
+          this.velocity.x += windForce.x * deltaTimeSeconds;
+          this.velocity.y += windForce.y * deltaTimeSeconds;
 
           this.position.x += this.velocity.x * deltaTimeSeconds;
           this.position.y += this.velocity.y * deltaTimeSeconds;
@@ -120,24 +123,33 @@
             this.spawnParticle(timestamp);
             this.lastSpawnTime = timestamp - (timestamp % this.spawnRate);
           }
+
+          // get windForce
+          // get angle between particle system and mouse
+          const D = {x: this.origin.x - mousePos.x, y: this.origin.y - mousePos.y};
+          // normalize and scale
+          const mag = Math.sqrt(D.x**2 + D.y**2);
+          const windForce = {x: (D.x/mag) * windMag, y: (D.y/mag) * windMag};
+
           this.particles = this.particles.filter((particle) => particle.active);
           for (let particle of this.particles) {
-            particle.run(timestamp);
+            particle.run(timestamp, windForce);
           }
         }
 
         spawnParticle(timestamp) {
           this.particles.push(
             new Particle(
-              {x: this.origin.x, y: this.origin.y},
-              {
-                x: this.minVel + Math.random() * (this.maxVel - this.minVel),
-                y: this.minVel + Math.random() * (this.maxVel - this.minVel),
-              },
+              { x: this.origin.x, y: this.origin.y },
+              { x: 0, y: 0 },
+              // {
+              //   x: this.minVel + Math.random() * (this.maxVel - this.minVel),
+              //   y: this.minVel + Math.random() * (this.maxVel - this.minVel),
+              // },
               5,
-              'square',
+              "square",
               1000, // 1 second
-              timestamp
+              timestamp,
             )
           );
         }
@@ -146,6 +158,7 @@
       function generateParticleSystem(origin) {
         particleSystems.push(new ParticleSystem(origin));
       }
+
     </script>
   </body>
 </html>
