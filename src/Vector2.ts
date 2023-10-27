@@ -47,11 +47,23 @@ export class Vector2 {
     return v;
   }
 
-  static distanceBetween(v1: Vector2, v2: Vector2) {
+  static distanceBetween(v1: Vector2, v2: Vector2): number {
     return Math.sqrt((v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2);
   }
 
   static scale(vector: Vector2, scalar: number): Vector2 {
     return new Vector2(vector.x * scalar, vector.y * scalar);
+  }
+
+  static dot(v1: Vector2, v2: Vector2): number {
+    return v1.x * v2.x + v1.y * v2.y;
+  }
+
+  static unitFromAngle(angle: number) {
+    return new Vector2(Math.cos(angle), Math.sin(angle));
+  }
+
+  static subtract(v1: Vector2, v2: Vector2): Vector2 {
+    return new Vector2(v1.x - v2.x, v1.y - v2.y);
   }
 }

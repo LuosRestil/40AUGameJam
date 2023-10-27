@@ -15,6 +15,10 @@ export function screenWrap(go: GameObject): void {
   }
 }
 
+export function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(value, max));
+}
+
 export function drawPoint(ctx: CanvasRenderingContext2D, pt: Vector2, color = 'red', radius = 10) {
   ctx.beginPath();
   ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);

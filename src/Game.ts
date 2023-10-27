@@ -1,31 +1,28 @@
-import { Asteroid } from "./Asteroid";
+import { Enemy } from "./Enemy";
 import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
-import { Ship } from "./Ship";
+import { Player } from "./Player";
 import { Vector2 } from "./Vector2";
 
 export class Game {
   gameContext: GameContext;
   lastTime: number;
   gameObjects: GameObject[];
-  ship: Ship;
-  blobs: Asteroid[];
+  player: Player;
+  enemies: Enemy[];
 
   constructor() {
     this.gameContext = GameContext.getInstance();
     this.lastTime = 0;
-    const ship = new Ship();
+    this.player = new Player();
     this.gameObjects = [];
-    this.gameObjects.push(ship);
-    const blob = new Asteroid(
-      new Vector2(400, 400),
-      50,
-      new Vector2(0, 0),
-      0,
-    );
-    this.gameObjects.push(blob);
-    this.ship = ship;
-    this.blobs = [blob];
+    this.gameObjects.push(this.player);
+    this.enemies = [];
+    for (let i = 0; i < 10; i++) {
+      const enemy = new Enemy(new Vector2(0, 0), 1);
+      this.gameObjects.push(enemy);
+      this.enemies.push(enemy);
+    }
   }
 
   run() {
@@ -58,11 +55,11 @@ export class Game {
 
   private detectShipAsteroidCollisions(): void {
     let collisionDetected = false;
-    for (const blob of this.blobs) {
-      if (this.ship.collidesWith(blob)) {
+    for (const enemy of this.enemies) {
+      if (this.player.collidesWith(enemy)) {
         collisionDetected = true;
       }
     }
-    this.ship.boundingBox.color = collisionDetected ? 'red' : 'limegreen';
+    if (collisionDetected) console.log('BOOM!');
   }
 }
