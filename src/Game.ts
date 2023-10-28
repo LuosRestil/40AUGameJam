@@ -18,11 +18,11 @@ export class Game {
     this.gameObjects = [];
     this.gameObjects.push(this.player);
     this.enemies = [];
-    for (let i = 0; i < 10; i++) {
-      const enemy = new Enemy(new Vector2(0, 0), 1);
-      this.gameObjects.push(enemy);
-      this.enemies.push(enemy);
-    }
+    // for (let i = 0; i < 10; i++) {
+    //   const enemy = new Enemy(new Vector2(0, 0), 1);
+    //   this.gameObjects.push(enemy);
+    //   this.enemies.push(enemy);
+    // }
   }
 
   run() {

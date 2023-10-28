@@ -25,3 +25,7 @@ export function drawPoint(ctx: CanvasRenderingContext2D, pt: Vector2, color = 'r
   ctx.fillStyle = color;
   ctx.fill();
 }
+
+export function randRange(min: number, max: number) {
+  return min + Math.random() * (max - min);
+}
