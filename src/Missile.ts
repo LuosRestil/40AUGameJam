@@ -1,6 +1,6 @@
 import { Enemy } from "./Enemy";
 
-class Missile {
+export class Missile {
   active: boolean = true;
 
   constructor() {}

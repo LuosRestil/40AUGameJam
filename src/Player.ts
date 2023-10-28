@@ -1,6 +1,7 @@
 import { Enemy } from "./Enemy";
 import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
+import { Missile } from "./Missile";
 import { ParticleSystem } from "./ParticleSystem";
 import { Vector2 } from "./Vector2";
 import { clamp, screenWrap } from "./utils";
