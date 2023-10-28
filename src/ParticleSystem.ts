@@ -96,7 +96,7 @@ export class ParticleSystem {
         new Vector2(Math.cos(angle), Math.sin(angle)).scale(-speed),
         5,
         "square",
-        400, // ms
+        randRange(300, 500), // ms
         timestamp
       )
     );

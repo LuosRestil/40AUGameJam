@@ -18,20 +18,21 @@ export class Game {
     this.gameObjects = [];
     this.gameObjects.push(this.player);
     this.enemies = [];
-    // for (let i = 0; i < 10; i++) {
-    //   const enemy = new Enemy(new Vector2(0, 0), 1);
-    //   this.gameObjects.push(enemy);
-    //   this.enemies.push(enemy);
-    // }
+    for (let i = 0; i < 10; i++) {
+      const enemy = new Enemy(new Vector2(0, 0), 1);
+      this.gameObjects.push(enemy);
+      this.enemies.push(enemy);
+    }
   }
 
   run() {
-    this.gameContext.ctx.fillStyle = "black";
-    this.gameContext.ctx.fillRect(
+    const ctx = this.gameContext.ctx;
+    ctx.fillStyle = "black";
+    ctx.fillRect(
       0,
       0,
-      this.gameContext.ctx.canvas.width,
-      this.gameContext.ctx.canvas.height
+      ctx.canvas.width,
+      ctx.canvas.height
     );
 
     requestAnimationFrame(this.animate);

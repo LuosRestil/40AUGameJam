@@ -3,7 +3,13 @@ import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
 import { ParticleSystem } from "./ParticleSystem";
 import { Vector2 } from "./Vector2";
-import { clamp, drawPoint, screenWrap } from "./utils";
+import { clamp, screenWrap } from "./utils";
+
+type PlayerInput = {
+  up: boolean;
+  left: boolean;
+  right: boolean;
+}
 
 export class Player implements GameObject {
   gameContext: GameContext;
@@ -16,6 +22,12 @@ export class Player implements GameObject {
   width: number = 50;
   height: number = 25;
   buttParticles: ParticleSystem;
+  input: PlayerInput = {
+    up: false,
+    left: false,
+    right: false
+  };
+  missiles: Missile[] = [];
 
   constructor() {
     this.gameContext = GameContext.getInstance();
@@ -28,11 +40,39 @@ export class Player implements GameObject {
     this.rotation = 0;
     this.maxVelocity = 800;
     this.buttParticles = new ParticleSystem();
+
+    document.addEventListener('keydown', (evt: KeyboardEvent) => {
+      const key = evt.key;
+      if (key === 'ArrowUp' || key === 'w') {
+        this.input.up = true;
+      }
+      if (key === 'ArrowLeft' || key === 'a') {
+        this.input.left = true;
+      }
+      if (key === 'ArrowRight' || key === 'd') {
+        this.input.right = true;
+      }
+      if (key === ' ' || key === 'f') {
+        this.fire();
+      }
+    });
+    
+    document.addEventListener('keyup', (evt: KeyboardEvent) => {
+      const key = evt.key;
+      if (key === 'ArrowUp' || key === 'w') {
+        this.input.up = false;
+      }
+      if (key === 'ArrowLeft' || key === 'a') {
+        this.input.left = false;
+      }
+      if (key === 'ArrowRight' || key === 'd') {
+        this.input.right = false;
+      }
+    });
   }
 
   update() {
-    const userInput = this.gameContext.userInput;
-    if (userInput.up) {
+    if (this.input.up) {
       this.applyPropulsionForce();
       this.buttParticles.active = true;
     } else {
@@ -52,10 +92,10 @@ export class Player implements GameObject {
       this.rotation
     );
 
-    if (userInput.left) {
+    if (this.input.left) {
       this.rotation -= this.rotationSpeed * this.gameContext.deltaTimeSeconds;
     }
-    if (userInput.right) {
+    if (this.input.right) {
       this.rotation += this.rotationSpeed * this.gameContext.deltaTimeSeconds;
     }
 
@@ -145,9 +185,8 @@ export class Player implements GameObject {
     this.acceleration.add(force);
   }
 
-  private drawBoundingBox(): void {
-    const ctx = this.gameContext.ctx;
-    ctx.strokeStyle = "limegreen";
-    ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
+  private fire(): void {
+    this.missiles.push(new Missile());
+    console.log('pew pew');
   }
 }
