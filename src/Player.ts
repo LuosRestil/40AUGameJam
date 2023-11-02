@@ -55,7 +55,7 @@ export class Player implements GameObject {
       if (key === "ArrowRight" || key === "d") {
         this.input.right = true;
       }
-      if (key === " " || key === "f") {
+      if (!evt.repeat && (key === " " || key === "f")) {
         this.fire();
       }
     });
