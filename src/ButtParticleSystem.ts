@@ -1,7 +1,7 @@
 import { Vector2 } from "./Vector2";
 import { randRange } from "./utils";
 
-export class Particle {
+export class ButtParticle {
   position: Vector2;
   velocity: Vector2;
   lifetime: number;
@@ -54,8 +54,8 @@ export class Particle {
   }
 }
 
-export class ParticleSystem {
-  particles: Particle[] = [];
+export class ButtParticleSystem {
+  particles: ButtParticle[] = [];
   spawnRate: number = 5;
   lastSpawnTime: number = 0;
   active: boolean = false;
@@ -88,7 +88,7 @@ export class ParticleSystem {
     const angle = randRange(minAngle, maxAngle);
     const speed = 200;
     this.particles.push(
-      new Particle(
+      new ButtParticle(
         new Vector2(origin.x, origin.y),
         new Vector2(Math.cos(angle), Math.sin(angle)).scale(-speed),
         5,

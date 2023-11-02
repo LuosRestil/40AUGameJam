@@ -1,7 +1,7 @@
 import { Enemy } from "./Enemy";
 import { GameObject } from "./GameObject";
 import { Missile } from "./Missile";
-import { ParticleSystem } from "./ParticleSystem";
+import { ButtParticleSystem } from "./ButtParticleSystem";
 import { Vector2 } from "./Vector2";
 import { clamp, screenWrap } from "./utils";
 
@@ -20,7 +20,7 @@ export class Player implements GameObject {
   rotationSpeed: number = Math.PI * 2;
   width: number = 50;
   height: number = 25;
-  buttParticles: ParticleSystem;
+  buttParticles: ButtParticleSystem;
   input: PlayerInput = {
     up: false,
     left: false,
@@ -28,6 +28,7 @@ export class Player implements GameObject {
   };
   missileSpeed: number = 200;
   missiles: Missile[] = [];
+  propulsionForce: number = 1000;
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.position = new Vector2(
@@ -38,7 +39,7 @@ export class Player implements GameObject {
     this.acceleration = new Vector2(0, 0);
     this.rotation = 0;
     this.maxVelocity = 800;
-    this.buttParticles = new ParticleSystem();
+    this.buttParticles = new ButtParticleSystem();
 
     document.addEventListener("keydown", (evt: KeyboardEvent) => {
       const key = evt.key;
@@ -81,7 +82,7 @@ export class Player implements GameObject {
 
   update(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number) {
     if (this.input.up) {
-      this.applyPropulsionForce();
+      this.applyPropulsionForce(deltaTimeSeconds);
       this.buttParticles.active = true;
     } else {
       this.buttParticles.active = false;
@@ -182,9 +183,9 @@ export class Player implements GameObject {
     return Vector2.distanceBetween(q, enemy.position) <= enemy.radius;
   }
 
-  private applyPropulsionForce(): void {
+  private applyPropulsionForce(deltaTimeSeconds: number): void {
     const force = Vector2.fromAngle(this.rotation);
-    force.scale(10);
+    force.scale(this.propulsionForce * deltaTimeSeconds);
     this.acceleration.add(force);
   }
 
@@ -202,7 +203,6 @@ export class Player implements GameObject {
       .add(this.position);
 
     this.missiles.push(
-      // new Missile(new Vector2(200, 200), new Vector2(0, 0))
       new Missile(nosePos, Vector2.scale(forward, this.missileSpeed))
     );
   }
