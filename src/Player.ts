@@ -73,6 +73,7 @@ export class Player implements GameObject {
   run(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number): void {
     this.update(ctx, deltaTimeSeconds);
     this.draw(ctx);
+    this.missiles = this.missiles.filter(missile => missile.active);
     for (const missile of this.missiles) {
       missile.run(ctx, deltaTimeSeconds);
     }

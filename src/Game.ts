@@ -6,7 +6,6 @@ import { Vector2 } from "./Vector2";
 export class Game {
   ctx: CanvasRenderingContext2D;
   lastTime: number;
-  gameObjects: GameObject[];
   player: Player;
   enemies: Enemy[];
 
@@ -14,12 +13,9 @@ export class Game {
     this.ctx = ctx;
     this.lastTime = 0;
     this.player = new Player(ctx);
-    this.gameObjects = [];
-    this.gameObjects.push(this.player);
     this.enemies = [];
     for (let i = 0; i < 10; i++) {
       const enemy = new Enemy(new Vector2(0, 0), 1);
-      this.gameObjects.push(enemy);
       this.enemies.push(enemy);
     }
   }
@@ -42,9 +38,12 @@ export class Game {
 
     this.ctx.fillStyle = "black";
     this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    for (let gameObject of this.gameObjects) {
-      gameObject.run(this.ctx, deltaTimeSeconds);
+    this.player.run(this.ctx, deltaTimeSeconds);
+    for (let enemy of this.enemies) {
+      enemy.run(this.ctx, deltaTimeSeconds);
     }
+    this.enemies = this.enemies.filter(enemy => enemy.active);
+    this.detectMissileAsteroidCollisions();
     this.detectShipAsteroidCollisions();
 
     requestAnimationFrame(this.animate);
@@ -58,5 +57,23 @@ export class Game {
       }
     }
     if (collisionDetected) console.log('BOOM!');
+  }
+
+  private detectMissileAsteroidCollisions(): void {
+    for (let missile of this.player.missiles) {
+      for (let enemy of this.enemies) {
+        const collisionDetected = missile.detectCollision(enemy);
+        if (collisionDetected) {
+          missile.active = false;
+          if (enemy.stage < 3) {
+            this.enemies.push(new Enemy(enemy.position.copy(), enemy.stage + 1));
+            this.enemies.push(new Enemy(enemy.position.copy(), enemy.stage + 1));
+          } else {
+            // TODO play explosion
+          }
+          enemy.active = false;
+        }
+      }
+    }
   }
 }

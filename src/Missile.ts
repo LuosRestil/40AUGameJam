@@ -42,6 +42,7 @@ export class Missile {
     ctx.rotate(this.angle);
     ctx.strokeStyle = "chocolate";
     ctx.fillStyle = "burlywood";
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
     ctx.stroke();
@@ -61,6 +62,9 @@ export class Missile {
   }
 
   detectCollision(enemy: Enemy): boolean {
-    return false;
+    return (
+      Vector2.distanceBetween(this.position, enemy.position) <=
+      this.radius + enemy.radius
+    );
   }
 }
