@@ -1,20 +1,19 @@
 import { Enemy } from "./Enemy";
-import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
 import { Player } from "./Player";
 import { Vector2 } from "./Vector2";
 
 export class Game {
-  gameContext: GameContext;
+  ctx: CanvasRenderingContext2D;
   lastTime: number;
   gameObjects: GameObject[];
   player: Player;
   enemies: Enemy[];
 
-  constructor() {
-    this.gameContext = GameContext.getInstance();
+  constructor(ctx: CanvasRenderingContext2D) {
+    this.ctx = ctx;
     this.lastTime = 0;
-    this.player = new Player();
+    this.player = new Player(ctx);
     this.gameObjects = [];
     this.gameObjects.push(this.player);
     this.enemies = [];
@@ -26,28 +25,25 @@ export class Game {
   }
 
   run() {
-    const ctx = this.gameContext.ctx;
-    ctx.fillStyle = "black";
-    ctx.fillRect(
+    this.ctx.fillStyle = "black";
+    this.ctx.fillRect(
       0,
       0,
-      ctx.canvas.width,
-      ctx.canvas.height
+      this.ctx.canvas.width,
+      this.ctx.canvas.height
     );
 
     requestAnimationFrame(this.animate);
   }
 
   private animate = (currentTime: number): void => {
-    this.gameContext.deltaTimeSeconds = (currentTime - this.lastTime)/1000;
+    const deltaTimeSeconds = (currentTime - this.lastTime)/1000;
     this.lastTime = currentTime;
 
-    const ctx = this.gameContext.ctx;
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    this.ctx.fillStyle = "black";
+    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     for (let gameObject of this.gameObjects) {
-      gameObject.draw();
-      gameObject.update();
+      gameObject.run(this.ctx, deltaTimeSeconds);
     }
     this.detectShipAsteroidCollisions();
 

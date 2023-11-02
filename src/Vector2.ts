@@ -41,6 +41,10 @@ export class Vector2 {
     return this;
   }
 
+  copy(): Vector2 {
+    return new Vector2(this.x, this.y);
+  }
+
   static fromAngle(angle: number, length: number = 1): Vector2 {
     const v = new Vector2(Math.cos(angle), Math.sin(angle));
     v.scale(length);

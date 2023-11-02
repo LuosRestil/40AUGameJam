@@ -1,4 +1,3 @@
-import { GameContext } from "./GameContext";
 import { Vector2 } from "./Vector2";
 import { randRange } from "./utils";
 
@@ -13,7 +12,6 @@ export class Particle {
   size: number;
   shape: string;
   colors: string[] = ["cyan", "magenta", "yellow", "lime", "red", "orange"];
-  gameContext: GameContext;
 
   constructor(
     position: Vector2,
@@ -33,7 +31,6 @@ export class Particle {
     this.color = this.colors[randIdx];
     this.size = size;
     this.shape = shape;
-    this.gameContext = GameContext.getInstance();
   }
 
   update(timestamp: number) {

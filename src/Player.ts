@@ -1,5 +1,4 @@
 import { Enemy } from "./Enemy";
-import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
 import { Missile } from "./Missile";
 import { ParticleSystem } from "./ParticleSystem";
@@ -10,10 +9,9 @@ type PlayerInput = {
   up: boolean;
   left: boolean;
   right: boolean;
-}
+};
 
 export class Player implements GameObject {
-  gameContext: GameContext;
   position: Vector2;
   velocity: Vector2;
   maxVelocity: number;
@@ -26,15 +24,15 @@ export class Player implements GameObject {
   input: PlayerInput = {
     up: false,
     left: false,
-    right: false
+    right: false,
   };
+  missileSpeed: number = 200;
   missiles: Missile[] = [];
 
-  constructor() {
-    this.gameContext = GameContext.getInstance();
+  constructor(ctx: CanvasRenderingContext2D) {
     this.position = new Vector2(
-      this.gameContext.ctx.canvas.width / 2,
-      this.gameContext.ctx.canvas.height / 2
+      ctx.canvas.width / 2,
+      ctx.canvas.height / 2
     );
     this.velocity = new Vector2(0, 0);
     this.acceleration = new Vector2(0, 0);
@@ -42,37 +40,45 @@ export class Player implements GameObject {
     this.maxVelocity = 800;
     this.buttParticles = new ParticleSystem();
 
-    document.addEventListener('keydown', (evt: KeyboardEvent) => {
+    document.addEventListener("keydown", (evt: KeyboardEvent) => {
       const key = evt.key;
-      if (key === 'ArrowUp' || key === 'w') {
+      if (key === "ArrowUp" || key === "w") {
         this.input.up = true;
       }
-      if (key === 'ArrowLeft' || key === 'a') {
+      if (key === "ArrowLeft" || key === "a") {
         this.input.left = true;
       }
-      if (key === 'ArrowRight' || key === 'd') {
+      if (key === "ArrowRight" || key === "d") {
         this.input.right = true;
       }
-      if (key === ' ' || key === 'f') {
+      if (key === " " || key === "f") {
         this.fire();
       }
     });
-    
-    document.addEventListener('keyup', (evt: KeyboardEvent) => {
+
+    document.addEventListener("keyup", (evt: KeyboardEvent) => {
       const key = evt.key;
-      if (key === 'ArrowUp' || key === 'w') {
+      if (key === "ArrowUp" || key === "w") {
         this.input.up = false;
       }
-      if (key === 'ArrowLeft' || key === 'a') {
+      if (key === "ArrowLeft" || key === "a") {
         this.input.left = false;
       }
-      if (key === 'ArrowRight' || key === 'd') {
+      if (key === "ArrowRight" || key === "d") {
         this.input.right = false;
       }
     });
   }
 
-  update() {
+  run(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number): void {
+    this.update(ctx, deltaTimeSeconds);
+    this.draw(ctx);
+    for (const missile of this.missiles) {
+      missile.run(ctx, deltaTimeSeconds);
+    }
+  }
+
+  update(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number) {
     if (this.input.up) {
       this.applyPropulsionForce();
       this.buttParticles.active = true;
@@ -85,19 +91,15 @@ export class Player implements GameObject {
       Math.cos(this.rotation),
       Math.sin(this.rotation)
     )
-    .scale(-this.width/2)
-    .add(this.position);
-    this.buttParticles.update(
-      Date.now(),
-      buttPos,
-      this.rotation
-    );
+      .scale(-this.width / 2)
+      .add(this.position);
+    this.buttParticles.update(Date.now(), buttPos, this.rotation);
 
     if (this.input.left) {
-      this.rotation -= this.rotationSpeed * this.gameContext.deltaTimeSeconds;
+      this.rotation -= this.rotationSpeed * deltaTimeSeconds;
     }
     if (this.input.right) {
-      this.rotation += this.rotationSpeed * this.gameContext.deltaTimeSeconds;
+      this.rotation += this.rotationSpeed * deltaTimeSeconds;
     }
 
     this.velocity.add(this.acceleration);
@@ -105,14 +107,13 @@ export class Player implements GameObject {
       this.velocity.setMagnitude(this.maxVelocity);
     }
     this.position.add(
-      Vector2.scale(this.velocity, this.gameContext.deltaTimeSeconds)
+      Vector2.scale(this.velocity, deltaTimeSeconds)
     );
     this.acceleration.scale(0);
-    screenWrap(this);
+    screenWrap(this, ctx);
   }
 
-  draw() {
-    const ctx = this.gameContext.ctx;
+  draw(ctx: CanvasRenderingContext2D) {
     this.buttParticles.draw(ctx);
 
     ctx.save();
@@ -187,7 +188,21 @@ export class Player implements GameObject {
   }
 
   private fire(): void {
-    this.missiles.push(new Missile());
-    console.log('pew pew');
+    // find nose position
+    const forward = new Vector2(
+      Math.cos(this.rotation),
+      Math.sin(this.rotation)
+    );
+    const nosePos = new Vector2(
+      Math.cos(this.rotation),
+      Math.sin(this.rotation)
+    )
+      .scale(this.width / 2)
+      .add(this.position);
+
+    this.missiles.push(
+      // new Missile(new Vector2(200, 200), new Vector2(0, 0))
+      new Missile(nosePos, Vector2.scale(forward, this.missileSpeed))
+    );
   }
 }

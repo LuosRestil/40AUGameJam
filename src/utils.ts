@@ -1,8 +1,8 @@
 import { GameObject } from "./GameObject";
 import { Vector2 } from "./Vector2";
 
-export function screenWrap(go: GameObject): void {
-  const canvas = go.gameContext.ctx.canvas;
+export function screenWrap(go: GameObject, ctx: CanvasRenderingContext2D): void {
+  const canvas = ctx.canvas;
   if (go.position.x > canvas.width) {
     go.position.x = 0;
   } else if (go.position.y > canvas.height) {

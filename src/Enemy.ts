@@ -1,18 +1,15 @@
-import { GameContext } from "./GameContext";
 import { GameObject } from "./GameObject";
 import { Vector2 } from "./Vector2";
 import { screenWrap } from "./utils";
 
 export class Enemy implements GameObject {
   position: Vector2;
-  radius: number;
   velocity: Vector2;
-  gameContext: GameContext;
+  radius: number;
   minVel: number = 20;
   maxVel: number = 120;
 
   constructor(origin: Vector2, stage: number) {
-    this.gameContext = GameContext.getInstance();
     this.position = origin;
     this.radius = 75 / stage;
     this.velocity = Vector2.unitFromAngle(Math.random() * Math.PI * 2).scale(
@@ -20,15 +17,19 @@ export class Enemy implements GameObject {
     );
   }
 
-  update() {
-    this.position.add(
-      Vector2.scale(this.velocity, this.gameContext.deltaTimeSeconds)
-    );
-    screenWrap(this);
+  run(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number): void {
+    this.update(ctx, deltaTimeSeconds);
+    this.draw(ctx);
   }
 
-  draw() {
-    const ctx = this.gameContext.ctx;
+  update(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number): void {
+    this.position.add(
+      Vector2.scale(this.velocity, deltaTimeSeconds)
+    );
+    screenWrap(this, ctx);
+  }
+
+  draw(ctx: CanvasRenderingContext2D): void {
     // body
     ctx.fillStyle = "limegreen";
     ctx.strokeStyle = "green";
