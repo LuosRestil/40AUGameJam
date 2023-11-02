@@ -5,22 +5,17 @@ import { Vector2 } from "./Vector2";
 
 export class Game {
   ctx: CanvasRenderingContext2D;
-  lastTime: number;
   player: Player;
-  enemies: Enemy[];
-  splats: Splat[];
+  enemies: Enemy[] = [];
+  splats: Splat[] = [];
+  lastTime: number = 0;
   score: number = 0;
+  level: number = 1;
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
-    this.lastTime = 0;
     this.player = new Player(this);
-    this.enemies = [];
-    this.splats = [];
-    for (let i = 0; i < 10; i++) {
-      const enemy = new Enemy(new Vector2(0, 0), 1, 1);
-      this.enemies.push(enemy);
-    }
+    this.spawnEnemies(1);
   }
 
   run() {
@@ -56,9 +51,17 @@ export class Game {
     this.splats = this.splats.filter(splat => splat.active);
 
     this.showScore();
+    this.showLevel();
 
     this.detectMissileAsteroidCollisions();
     this.detectShipAsteroidCollisions();
+
+    if (!this.enemies.length) {
+      this.level++;
+      this.spawnEnemies(this.level);
+      this.player.position = new Vector2(this.ctx.canvas.width/2, this.ctx.canvas.height/2);
+      this.player.velocity = new Vector2(0, 0);
+    }
 
     requestAnimationFrame(this.animate);
   };
@@ -73,6 +76,15 @@ export class Game {
     this.ctx.font = "30px monospace";
     this.ctx.strokeText('Score: ' + this.score, this.ctx.canvas.width / 4 * 3, 50);
     this.ctx.fillText('Score: ' + this.score, this.ctx.canvas.width / 4 * 3, 50);
+  }
+
+  private showLevel(): void {
+    this.ctx.fillStyle = 'white';
+    this.ctx.strokeStyle = 'black';
+    this.ctx.lineWidth = 5;
+    this.ctx.font = "30px monospace";
+    this.ctx.strokeText('Level: ' + this.level, 100, 50);
+    this.ctx.fillText('Level: ' + this.level, 100, 50);
   }
 
   private detectShipAsteroidCollisions(): void {
@@ -103,6 +115,13 @@ export class Game {
           enemy.active = false;
         }
       }
+    }
+  }
+
+  private spawnEnemies(nEnemies: number) {
+    for (let i = 0; i < nEnemies; i++) {
+      const enemy = new Enemy(new Vector2(0, 0), 1, 1);
+      this.enemies.push(enemy);
     }
   }
 }
