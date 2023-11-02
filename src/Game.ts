@@ -1,6 +1,6 @@
 import { Enemy } from "./Enemy";
-import { GameObject } from "./GameObject";
 import { Player } from "./Player";
+import { Splat } from "./Splat";
 import { Vector2 } from "./Vector2";
 
 export class Game {
@@ -8,14 +8,16 @@ export class Game {
   lastTime: number;
   player: Player;
   enemies: Enemy[];
+  splats: Splat[];
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.lastTime = 0;
     this.player = new Player(ctx);
     this.enemies = [];
+    this.splats = [];
     for (let i = 0; i < 10; i++) {
-      const enemy = new Enemy(new Vector2(0, 0), 1);
+      const enemy = new Enemy(new Vector2(0, 0), 1, 1);
       this.enemies.push(enemy);
     }
   }
@@ -43,6 +45,10 @@ export class Game {
       enemy.run(this.ctx, deltaTimeSeconds);
     }
     this.enemies = this.enemies.filter(enemy => enemy.active);
+    for (let splat of this.splats) {
+      splat.run(this.ctx, deltaTimeSeconds);
+    }
+    this.splats = this.splats.filter(splat => splat.active);
     this.detectMissileAsteroidCollisions();
     this.detectShipAsteroidCollisions();
 
@@ -66,10 +72,10 @@ export class Game {
         if (collisionDetected) {
           missile.active = false;
           if (enemy.stage < 3) {
-            this.enemies.push(new Enemy(enemy.position.copy(), enemy.stage + 1));
-            this.enemies.push(new Enemy(enemy.position.copy(), enemy.stage + 1));
+            this.enemies.push(new Enemy(enemy.position.copy(), enemy.stage + 1, enemy.scale / 2));
+            this.enemies.push(new Enemy(enemy.position.copy(), enemy.stage + 1, enemy.scale / 2));
           } else {
-            // TODO play explosion
+            this.splats.push(new Splat(enemy.position.copy()));
           }
           enemy.active = false;
         }

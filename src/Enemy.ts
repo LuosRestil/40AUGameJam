@@ -10,11 +10,13 @@ export class Enemy implements GameObject {
   minVel: number = 20;
   maxVel: number = 120;
   stage: number;
+  scale: number;
 
-  constructor(origin: Vector2, stage: number) {
+  constructor(origin: Vector2, stage: number, scale: number) {
     this.position = origin;
     this.stage = stage;
-    this.radius = 75 / stage;
+    this.scale = scale;
+    this.radius = 75 * this.scale;
     this.velocity = Vector2.unitFromAngle(Math.random() * Math.PI * 2).scale(
       Math.random() * (this.maxVel - this.minVel) + this.minVel
     );
@@ -36,7 +38,7 @@ export class Enemy implements GameObject {
     // body
     ctx.fillStyle = "limegreen";
     ctx.strokeStyle = "green";
-    ctx.lineWidth = 3 / this.stage;
+    ctx.lineWidth = 3 * this.scale;
     ctx.beginPath();
     ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
