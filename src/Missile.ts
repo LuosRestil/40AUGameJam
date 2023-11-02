@@ -61,7 +61,7 @@ export class Missile {
     ctx.restore();
   }
 
-  detectCollision(enemy: Enemy): boolean {
+  collidesWith(enemy: Enemy): boolean {
     return (
       Vector2.distanceBetween(this.position, enemy.position) <=
       this.radius + enemy.radius

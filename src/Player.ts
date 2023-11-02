@@ -4,6 +4,7 @@ import { Missile } from "./Missile";
 import { ButtParticleSystem } from "./ButtParticleSystem";
 import { Vector2 } from "./Vector2";
 import { clamp, screenWrap } from "./utils";
+import { Game } from "./Game";
 
 type PlayerInput = {
   up: boolean;
@@ -29,11 +30,13 @@ export class Player implements GameObject {
   missileSpeed: number = 200;
   missiles: Missile[] = [];
   propulsionForce: number = 1000;
+  game: Game;
 
-  constructor(ctx: CanvasRenderingContext2D) {
+  constructor(game: Game) {
+    this.game = game;
     this.position = new Vector2(
-      ctx.canvas.width / 2,
-      ctx.canvas.height / 2
+      game.ctx.canvas.width / 2,
+      game.ctx.canvas.height / 2
     );
     this.velocity = new Vector2(0, 0);
     this.acceleration = new Vector2(0, 0);
@@ -190,6 +193,8 @@ export class Player implements GameObject {
   }
 
   private fire(): void {
+    this.game.score -= 1;
+
     // find nose position
     const forward = new Vector2(
       Math.cos(this.rotation),
