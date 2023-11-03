@@ -43,6 +43,8 @@ export class Enemy implements GameObject {
 
   draw(ctx: CanvasRenderingContext2D): void {
     // body
+    ctx.shadowBlur = 40/this.requiredHits;
+    ctx.shadowColor = this.colors.fill[this.requiredHits - 1];
     ctx.fillStyle = this.colors.fill[this.requiredHits - 1];
     ctx.strokeStyle = this.colors.stroke[this.requiredHits - 1];
     ctx.lineWidth = 3 * this.scale;
@@ -50,6 +52,7 @@ export class Enemy implements GameObject {
     ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
+    ctx.shadowBlur = 0;
     // left eye white
     ctx.fillStyle = "white";
     ctx.strokeStyle = "blue";
