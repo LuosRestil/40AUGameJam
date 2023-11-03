@@ -15,7 +15,7 @@ export class Game {
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.player = new Player(this);
-    this.spawnEnemies(1);
+    this.spawnEnemies();
   }
 
   run() {
@@ -58,9 +58,10 @@ export class Game {
 
     if (!this.enemies.length) {
       this.level++;
-      this.spawnEnemies(this.level);
+      this.spawnEnemies();
       this.player.position = new Vector2(this.ctx.canvas.width/2, this.ctx.canvas.height/2);
       this.player.velocity = new Vector2(0, 0);
+      this.player.missiles = [];
     }
 
     requestAnimationFrame(this.animate);
@@ -79,6 +80,7 @@ export class Game {
   }
 
   private showLevel(): void {
+    // TODO style
     this.ctx.fillStyle = 'white';
     this.ctx.strokeStyle = 'black';
     this.ctx.lineWidth = 5;
@@ -106,20 +108,23 @@ export class Game {
           this.score += 10 * enemy.stage;
 
           missile.active = false;
-          if (enemy.stage < 3) {
-            this.enemies.push(new Enemy(enemy.position.copy(), enemy.stage + 1, enemy.scale / 2));
-            this.enemies.push(new Enemy(enemy.position.copy(), enemy.stage + 1, enemy.scale / 2));
-          } else {
-            this.splats.push(new Splat(enemy.position.copy()));
+          enemy.requiredHits--;
+          if (enemy.requiredHits === 0) {
+            if (enemy.stage < 3) {
+              this.enemies.push(new Enemy(enemy.position.copy(), enemy.stage + 1, enemy.scale / 2));
+              this.enemies.push(new Enemy(enemy.position.copy(), enemy.stage + 1, enemy.scale / 2));
+            } else {
+              this.splats.push(new Splat(enemy.position.copy()));
+            }
+            enemy.active = false;
           }
-          enemy.active = false;
         }
       }
     }
   }
 
-  private spawnEnemies(nEnemies: number) {
-    for (let i = 0; i < nEnemies; i++) {
+  private spawnEnemies() {
+    for (let i = 0; i < this.level * 2; i++) {
       const enemy = new Enemy(new Vector2(0, 0), 1, 1);
       this.enemies.push(enemy);
     }
