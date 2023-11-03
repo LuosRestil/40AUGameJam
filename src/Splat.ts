@@ -12,18 +12,18 @@ class SplatParticle {
     this.velocity = velocity;
   }
 
-  run(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number): void {
+  run(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number, fillColor: string, strokeColor: string): void {
     this.update(deltaTimeSeconds);
-    this.draw(ctx);
+    this.draw(ctx, fillColor, strokeColor);
   }
 
   update(deltaTimeSeconds: number): void {
     this.position.add(Vector2.scale(this.velocity, deltaTimeSeconds));
   }
 
-  draw(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = 'limegreen';
-    ctx.strokeStyle = 'green';
+  draw(ctx: CanvasRenderingContext2D, fillColor: string, strokeColor: string): void {
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = strokeColor;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(this.position.x, this.position.y, 5, 0, Math.PI * 2);
@@ -33,16 +33,19 @@ class SplatParticle {
 }
 
 export class Splat {
-  particles: SplatParticle[];
   origin: Vector2;
+  fillColor: string;
+  strokeColor: string;
+  particles: SplatParticle[] = [];
   particleSpeed = 300;
   active: boolean = true;
   lifetime: number = 0.25;
   elapsed: number = 0;
   
-  constructor(origin: Vector2) {
+  constructor(origin: Vector2, fillColor: string, strokeColor: string) {
     this.origin = origin;
-    this.particles = [];
+    this.fillColor = fillColor;
+    this.strokeColor = strokeColor;
     for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
       const vel = new Vector2(Math.cos(angle), Math.sin(angle)).scale(this.particleSpeed);
       this.particles.push(new SplatParticle(this.origin.copy(), vel));
@@ -51,7 +54,7 @@ export class Splat {
 
   run(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number) {
     for (let particle of this.particles) {
-      particle.run(ctx, deltaTimeSeconds);
+      particle.run(ctx, deltaTimeSeconds, this.fillColor, this.strokeColor);
     }
     this.elapsed += deltaTimeSeconds;
     if (this.elapsed > this.lifetime) this.active = false;

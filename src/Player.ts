@@ -31,6 +31,8 @@ export class Player implements GameObject {
   missiles: Missile[] = [];
   propulsionForce: number = 1000;
   game: Game;
+  lives: number = 1;
+  active: boolean = true;
 
   constructor(game: Game) {
     this.game = game;
@@ -45,6 +47,8 @@ export class Player implements GameObject {
     this.buttParticles = new ButtParticleSystem();
 
     document.addEventListener("keydown", (evt: KeyboardEvent) => {
+      if (!this.active) return;
+
       const key = evt.key;
       if (key === "ArrowUp" || key === "w") {
         this.input.up = true;
