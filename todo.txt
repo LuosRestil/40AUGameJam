@@ -10,6 +10,7 @@
     [ ] each frame removes y percent from bar (scaled by deltatime)
     [ ] full bar disables cookie cannon for z seconds, then resets bar
 [ ] title screen
+[ ] background
 
 [ ] music
 [ ] sfx

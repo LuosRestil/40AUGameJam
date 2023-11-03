@@ -198,13 +198,13 @@ export class Game {
 
   refresh(): void {
     this.enemies = [];
-    this.spawnEnemies();
     this.splats = [];
     this.lastTime = 0;
     this.score = 0;
     this.level = 1;
-    this.gameOver = false;
+    this.spawnEnemies();
     this.player.position = new Vector2(this.ctx.canvas.width/2, this.ctx.canvas.height/2);
     this.player.velocity = new Vector2(0, 0);
+    this.gameOver = false;
   }
 }
