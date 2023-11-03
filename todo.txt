@@ -1,12 +1,21 @@
-[] player death
-    [] game over screen
-    [] play again
-    [] leaderboard
-[] multiple lives
-    [] score milestones grant lives
-[] cookie cannon cooldown
-    [] green/yellow/red gradient bar
-    [] each cookie adds x percent to the bar
-    [] each frame removes y percent from bar (scaled by deltatime)
-    [] full bar disables cookie cannon for z seconds, then resets bar
-[] title screen
+[ ] player death
+    [X] game over screen
+    [X] play again
+    [ ] leaderboard
+[ ] multiple lives
+    [ ] score milestones grant lives
+[ ] cookie cannon cooldown
+    [ ] green/yellow/red gradient bar
+    [ ] each cookie adds x percent to the bar
+    [ ] each frame removes y percent from bar (scaled by deltatime)
+    [ ] full bar disables cookie cannon for z seconds, then resets bar
+[ ] title screen
+
+[ ] music
+[ ] sfx
+    [ ] butt sparkles
+    [ ] cookie cannon
+    [ ] enemy hit
+    [ ] enemy split
+    [ ] enemy splat
+    [ ] player splat

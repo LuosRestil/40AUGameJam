@@ -11,11 +11,18 @@ export class Game {
   lastTime: number = 0;
   score: number = 0;
   level: number = 1;
+  gameOver: boolean = false;
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.player = new Player(this);
     this.spawnEnemies();
+
+    document.addEventListener('keydown', (evt) => {
+      if (this.gameOver && evt.key === 'r') {
+        this.refresh();
+      }
+    });
   }
 
   run() {
@@ -43,10 +50,9 @@ export class Game {
     }
     this.splats = this.splats.filter((splat) => splat.active);
 
-    if (this.player.active) {
+    if (!this.gameOver) {
       this.player.run(this.ctx, deltaTimeSeconds);
     } else {
-      // game over stuff
       this.ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
       this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
       this.showGameOver();
@@ -55,10 +61,10 @@ export class Game {
     this.showScore();
     this.showLevel();
 
-    if (this.player.active) {
+    if (!this.gameOver) {
       this.detectPlayerEnemyCollisions();
+      this.detectMissileEnemyCollisions();
     }
-    this.detectMissileEnemyCollisions();
 
     if (!this.enemies.length) {
       this.level++;
@@ -107,13 +113,18 @@ export class Game {
     this.ctx.strokeText(
       "GAME OVER",
       this.ctx.canvas.width / 2,
-      this.ctx.canvas.height / 2
+      this.ctx.canvas.height / 2 - 50
     );
     this.ctx.fillText(
       "GAME OVER",
       this.ctx.canvas.width / 2,
-      this.ctx.canvas.height / 2
+      this.ctx.canvas.height / 2 - 50
     );
+    this.ctx.fillStyle = "white";
+    this.ctx.strokeStyle = "black";
+    this.ctx.font = "48px monospace";
+    this.ctx.strokeText("Press \"R\" to play again", this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 50);
+    this.ctx.fillText("Press \"R\" to play again", this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 50);
   }
 
   private detectPlayerEnemyCollisions(): void {
@@ -130,7 +141,7 @@ export class Game {
       );
       this.player.lives--;
       if (this.player.lives < 1) {
-        this.player.active = false;
+        this.gameOver = true;
       } else {
         this.player.position = new Vector2(
           this.ctx.canvas.width / 2,
@@ -178,10 +189,22 @@ export class Game {
     }
   }
 
-  private spawnEnemies() {
+  private spawnEnemies(): void {
     for (let i = 0; i < this.level * 2; i++) {
       const enemy = new Enemy(new Vector2(0, 0), 1, 1);
       this.enemies.push(enemy);
     }
+  }
+
+  refresh(): void {
+    this.enemies = [];
+    this.spawnEnemies();
+    this.splats = [];
+    this.lastTime = 0;
+    this.score = 0;
+    this.level = 1;
+    this.gameOver = false;
+    this.player.position = new Vector2(this.ctx.canvas.width/2, this.ctx.canvas.height/2);
+    this.player.velocity = new Vector2(0, 0);
   }
 }

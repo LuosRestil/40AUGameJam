@@ -32,7 +32,6 @@ export class Player implements GameObject {
   propulsionForce: number = 1000;
   game: Game;
   lives: number = 1;
-  active: boolean = true;
 
   constructor(game: Game) {
     this.game = game;
@@ -47,7 +46,7 @@ export class Player implements GameObject {
     this.buttParticles = new ButtParticleSystem();
 
     document.addEventListener("keydown", (evt: KeyboardEvent) => {
-      if (!this.active) return;
+      if (this.game.gameOver) return;
 
       const key = evt.key;
       if (key === "ArrowUp" || key === "w") {
@@ -197,7 +196,7 @@ export class Player implements GameObject {
   }
 
   private fire(): void {
-    this.game.score -= 1;
+    if (this.game.score > 0) this.game.score -= 1;
 
     // find nose position
     const forward = new Vector2(
