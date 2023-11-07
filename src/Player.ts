@@ -5,6 +5,8 @@ import { ButtParticleSystem } from "./ButtParticleSystem";
 import { Vector2 } from "./Vector2";
 import { clamp, screenWrap } from "./utils";
 import { Game } from "./Game";
+import { Splat } from "./Splat";
+import { Tag } from "./Tag";
 
 type PlayerInput = {
   up: boolean;
@@ -28,10 +30,11 @@ export class Player implements GameObject {
     right: false,
   };
   missileSpeed: number = 200;
-  missiles: Missile[] = [];
   propulsionForce: number = 1000;
   game: Game;
-  lives: number = 1;
+  // lives: number = 1;
+  isActive = true;
+  tag: Tag = Tag.PLAYER;
 
   constructor(game: Game) {
     this.game = game;
@@ -44,79 +47,27 @@ export class Player implements GameObject {
     this.rotation = 0;
     this.maxVelocity = 800;
     this.buttParticles = new ButtParticleSystem();
-
-    document.addEventListener("keydown", (evt: KeyboardEvent) => {
-      if (this.game.gameOver) return;
-
-      const key = evt.key;
-      if (key === "ArrowUp" || key === "w") {
-        this.input.up = true;
-      }
-      if (key === "ArrowLeft" || key === "a") {
-        this.input.left = true;
-      }
-      if (key === "ArrowRight" || key === "d") {
-        this.input.right = true;
-      }
-      if (!evt.repeat && (key === " " || key === "f")) {
-        this.fire();
-      }
-    });
-
-    document.addEventListener("keyup", (evt: KeyboardEvent) => {
-      const key = evt.key;
-      if (key === "ArrowUp" || key === "w") {
-        this.input.up = false;
-      }
-      if (key === "ArrowLeft" || key === "a") {
-        this.input.left = false;
-      }
-      if (key === "ArrowRight" || key === "d") {
-        this.input.right = false;
-      }
-    });
+    this.addEventListeners();
   }
 
   run(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number): void {
     this.update(ctx, deltaTimeSeconds);
     this.draw(ctx);
-    this.missiles = this.missiles.filter(missile => missile.active);
-    for (const missile of this.missiles) {
-      missile.run(ctx, deltaTimeSeconds);
-    }
+    this.detectEnemyCollisions((this.game.gameObjects[Tag.ENEMY] ?? []) as Enemy[]);
   }
 
   update(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number) {
-    if (this.input.up) {
-      this.applyPropulsionForce(deltaTimeSeconds);
-      this.buttParticles.active = true;
-    } else {
-      this.buttParticles.active = false;
-    }
+    this.handleMovementInput(deltaTimeSeconds);
 
-    // calculate butt position
-    const buttPos = new Vector2(
-      Math.cos(this.rotation),
-      Math.sin(this.rotation)
-    )
-      .scale(-this.width / 2)
-      .add(this.position);
+    const buttPos = this.getButtPos();
     this.buttParticles.update(Date.now(), buttPos, this.rotation);
 
-    if (this.input.left) {
-      this.rotation -= this.rotationSpeed * deltaTimeSeconds;
-    }
-    if (this.input.right) {
-      this.rotation += this.rotationSpeed * deltaTimeSeconds;
-    }
-
-    this.velocity.add(this.acceleration);
+    this.velocity.add(this.acceleration.scale(deltaTimeSeconds));
     if (this.velocity.getMagnitude() > this.maxVelocity) {
       this.velocity.setMagnitude(this.maxVelocity);
     }
-    this.position.add(
-      Vector2.scale(this.velocity, deltaTimeSeconds)
-    );
+    this.position.add(Vector2.scale(this.velocity, deltaTimeSeconds));
+
     this.acceleration.scale(0);
     screenWrap(this, ctx);
   }
@@ -171,7 +122,47 @@ export class Player implements GameObject {
     ctx.restore();
   }
 
-  collidesWith(enemy: Enemy): boolean {
+  private addEventListeners(): void {
+    document.addEventListener("keydown", (evt: KeyboardEvent) => {
+      if (this.game.gameOver) return;
+
+      const key = evt.key;
+      if (key === "ArrowUp" || key === "w") {
+        this.input.up = true;
+      }
+      if (key === "ArrowLeft" || key === "a") {
+        this.input.left = true;
+      }
+      if (key === "ArrowRight" || key === "d") {
+        this.input.right = true;
+      }
+    });
+
+    document.addEventListener("keyup", (evt: KeyboardEvent) => {
+      const key = evt.key;
+      if (key === "ArrowUp" || key === "w") {
+        this.input.up = false;
+      }
+      if (key === "ArrowLeft" || key === "a") {
+        this.input.left = false;
+      }
+      if (key === "ArrowRight" || key === "d") {
+        this.input.right = false;
+      }
+    });
+
+    this.handleFirePressed = this.handleFirePressed.bind(this);
+
+    document.addEventListener("keydown", this.handleFirePressed);
+  }
+
+  private handleFirePressed(evt: KeyboardEvent) {
+    if (!evt.repeat && (evt.key === " " || evt.key === "f")) {
+      this.fire();
+    }
+  }
+
+  private collidesWith(enemy: Enemy): boolean {
     const D = Vector2.subtract(enemy.position, this.position); // a vector pointing from player to enemy
     const U = new Vector2(Math.cos(this.rotation), Math.sin(this.rotation)); // a unit vector representing the local x axis of the obb
     const V = new Vector2(-Math.sin(this.rotation), Math.cos(this.rotation)); // a unit vector representing the local y axis of the obb
@@ -189,29 +180,81 @@ export class Player implements GameObject {
     return Vector2.distanceBetween(q, enemy.position) <= enemy.radius;
   }
 
-  private applyPropulsionForce(deltaTimeSeconds: number): void {
+  private applyPropulsionForce(): void {
     const force = Vector2.fromAngle(this.rotation);
-    force.scale(this.propulsionForce * deltaTimeSeconds);
+    force.scale(this.propulsionForce);
     this.acceleration.add(force);
   }
 
   private fire(): void {
     if (this.game.score > 0) this.game.score -= 1;
 
-    // find nose position
     const forward = new Vector2(
       Math.cos(this.rotation),
       Math.sin(this.rotation)
     );
-    const nosePos = new Vector2(
-      Math.cos(this.rotation),
-      Math.sin(this.rotation)
-    )
+    const nosePos = this.getNosePos();
+    this.game.addGameObject(new Missile(nosePos, Vector2.scale(forward, this.missileSpeed), this.game));
+  }
+
+  private handleMovementInput(deltaTimeSeconds: number) {
+    if (this.input.up) {
+      this.applyPropulsionForce();
+      this.buttParticles.isActive = true;
+    } else {
+      this.buttParticles.isActive = false;
+    }
+
+    if (this.input.left) {
+      this.rotation -= this.rotationSpeed * deltaTimeSeconds;
+    }
+    if (this.input.right) {
+      this.rotation += this.rotationSpeed * deltaTimeSeconds;
+    }
+  }
+
+  private getButtPos(): Vector2 {
+    return new Vector2(Math.cos(this.rotation), Math.sin(this.rotation))
+      .scale(-this.width / 2)
+      .add(this.position);
+  }
+
+  private getNosePos(): Vector2 {
+    return new Vector2(Math.cos(this.rotation), Math.sin(this.rotation))
       .scale(this.width / 2)
       .add(this.position);
+  }
 
-    this.missiles.push(
-      new Missile(nosePos, Vector2.scale(forward, this.missileSpeed))
-    );
+  private detectEnemyCollisions(enemies: Enemy[]) {
+    let collisionDetected = false;
+    for (const enemy of enemies) {
+      if (this.collidesWith(enemy)) {
+        collisionDetected = true;
+      }
+    }
+
+    if (collisionDetected) {
+      this.destroy();
+
+      // TODO should you get multiple lives?
+      // this.lives--;
+      // if (this.lives < 1) {
+      //   this.isActive = false;
+      //   this.game.gameOver = true;
+      // } else {
+      //   this.position = new Vector2(
+      //     this.game.ctx.canvas.width / 2,
+      //     this.game.ctx.canvas.height / 2
+      //   );
+      //   this.velocity = new Vector2(0, 0);
+      // }
+    }
+  }
+
+  private destroy() {
+    this.game.addGameObject(new Splat(this.position.copy(), "crimson", "darkred"));
+    this.isActive = false;
+    this.game.gameOver = true;
+    document.removeEventListener("keydown", this.handleFirePressed);
   }
 }

@@ -61,7 +61,7 @@
         position;
         velocity;
         lifetime;
-        active;
+        isActive;
         lastTime;
         createdTime;
         color;
@@ -72,7 +72,7 @@
           this.position = position;
           this.velocity = velocity;
           this.lifetime = lifetime;
-          this.active = true;
+          this.isActive = true;
           this.createdTime = createdTime;
           this.lastTime = createdTime;
           const randIdx = Math.floor(Math.random() * colors.length);
@@ -96,7 +96,7 @@
           this.position.x += this.velocity.x * deltaTimeSeconds;
           this.position.y += this.velocity.y * deltaTimeSeconds;
 
-          if (timestamp - this.createdTime > this.lifetime) this.active = false;
+          if (timestamp - this.createdTime > this.lifetime) this.isActive = false;
         }
 
         draw() {
@@ -137,7 +137,7 @@
           const mag = Math.sqrt(D.x**2 + D.y**2);
           const windForce = {x: (D.x/mag) * windMag, y: (D.y/mag) * windMag};
 
-          this.particles = this.particles.filter((particle) => particle.active);
+          this.particles = this.particles.filter((particle) => particle.isActive);
           for (let particle of this.particles) {
             particle.run(timestamp, windForce);
           }

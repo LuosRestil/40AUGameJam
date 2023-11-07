@@ -1,4 +1,5 @@
 import { GameObject } from "./GameObject";
+import { Tag } from "./Tag";
 import { Vector2 } from "./Vector2";
 import { screenWrap } from "./utils";
 
@@ -6,7 +7,7 @@ export class Enemy implements GameObject {
   position: Vector2;
   velocity: Vector2;
   radius: number;
-  active: boolean = true;
+  isActive: boolean = true;
   minVel: number = 20;
   maxVel: number = 120;
   stage: number;
@@ -16,6 +17,7 @@ export class Enemy implements GameObject {
     fill: ["limegreen", "violet", "crimson"],
     stroke: ["green", "rebeccapurple", "firebrick"],
   };
+  tag: Tag = Tag.ENEMY;
 
   constructor(origin: Vector2, stage: number, scale: number) {
     this.position = origin;

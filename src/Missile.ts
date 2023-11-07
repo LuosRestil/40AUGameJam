@@ -1,22 +1,29 @@
 import { Enemy } from "./Enemy";
+import { Game } from "./Game";
+import { Splat } from "./Splat";
+import { Tag } from "./Tag";
 import { Vector2 } from "./Vector2";
 import { randRange } from "./utils";
 
 export class Missile {
-  active: boolean = true;
+  isActive: boolean = true;
   position: Vector2;
   velocity: Vector2;
   radius: number = 10;
   angle: number = 0;
   rotationSpeed: number;
+  game: Game;
+  tag: Tag = Tag.PROJECTILE;
 
-  constructor(origin: Vector2, velocity: Vector2) {
+  constructor(origin: Vector2, velocity: Vector2, game: Game) {
     this.position = origin;
     this.velocity = velocity;
+    this.game = game;
     this.rotationSpeed = randRange(-Math.PI * 2, Math.PI * 2);
   }
 
   run(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number): void {
+    this.detectEnemyCollision((this.game.gameObjects[Tag.ENEMY] ?? []) as Enemy[]);
     this.update(ctx, deltaTimeSeconds);
     this.draw(ctx);
   }
@@ -31,7 +38,7 @@ export class Missile {
       this.position.x < 0 ||
       this.position.y < 0
     ) {
-      this.active = false;
+      this.isActive = false;
     }
     this.angle += this.rotationSpeed * deltaTimeSeconds;
   }
@@ -59,6 +66,32 @@ export class Missile {
     ctx.arc(4, 4, 2, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
+  }
+
+  private detectEnemyCollision(enemies: Enemy[]): void {
+    for (let enemy of enemies) {
+      const collisionDetected = this.collidesWith(enemy);
+      if (collisionDetected) {
+        this.game.score += 10 * enemy.stage;
+        this.isActive = false;
+        enemy.requiredHits--;
+        if (enemy.requiredHits === 0) {
+          if (enemy.stage < 3) {
+            this.game.addGameObject(
+              new Enemy(enemy.position.copy(), enemy.stage + 1, enemy.scale / 2)
+            );
+            this.game.addGameObject(
+              new Enemy(enemy.position.copy(), enemy.stage + 1, enemy.scale / 2)
+            );
+          } else {
+            this.game.addGameObject(
+              new Splat(enemy.position.copy(), "limegreen", "green")
+            );
+          }
+          enemy.isActive = false;
+        }
+      }
+    }
   }
 
   collidesWith(enemy: Enemy): boolean {

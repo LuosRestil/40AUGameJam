@@ -5,7 +5,7 @@ export class ButtParticle {
   position: Vector2;
   velocity: Vector2;
   lifetime: number;
-  active: boolean;
+  isActive: boolean;
   lastTime: number;
   createdTime: number;
   color: string;
@@ -24,7 +24,7 @@ export class ButtParticle {
     this.position = position;
     this.velocity = velocity;
     this.lifetime = lifetime;
-    this.active = true;
+    this.isActive = true;
     this.createdTime = createdTime;
     this.lastTime = createdTime;
     const randIdx = Math.floor(Math.random() * this.colors.length);
@@ -40,7 +40,7 @@ export class ButtParticle {
     this.position.x += this.velocity.x * deltaTimeSeconds;
     this.position.y += this.velocity.y * deltaTimeSeconds;
 
-    if (timestamp - this.createdTime > this.lifetime) this.active = false;
+    if (timestamp - this.createdTime > this.lifetime) this.isActive = false;
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -58,18 +58,18 @@ export class ButtParticleSystem {
   particles: ButtParticle[] = [];
   spawnRate: number = 5;
   lastSpawnTime: number = 0;
-  active: boolean = false;
+  isActive: boolean = false;
 
   constructor() {}
 
   update(timestamp: number, origin: Vector2, playerAngle: number) {
     const deltaTime = timestamp - this.lastSpawnTime;
-    if (deltaTime > this.spawnRate && this.active) {
+    if (deltaTime > this.spawnRate && this.isActive) {
       this.spawnParticle(timestamp, origin, playerAngle);
       this.lastSpawnTime = timestamp - (timestamp % this.spawnRate);
     }
 
-    this.particles = this.particles.filter((particle) => particle.active);
+    this.particles = this.particles.filter((particle) => particle.isActive);
     for (let particle of this.particles) {
       particle.update(timestamp);
     }

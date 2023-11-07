@@ -11,6 +11,7 @@
     [ ] full bar disables cookie cannon for z seconds, then resets bar
 [ ] title screen
 [ ] background
+[ ] refactor particle systems for code reuse?
 
 [ ] music
 [ ] sfx
