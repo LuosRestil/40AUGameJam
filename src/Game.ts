@@ -10,7 +10,7 @@ export class Game {
   splats: Splat[] = [];
   lastTime: number = 0;
   score: number = 0;
-  level: number = 1;
+  level: number = 5;
   gameOver: boolean = false;
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -26,8 +26,9 @@ export class Game {
   }
 
   run() {
-    this.ctx.fillStyle = "black";
-    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    // this.ctx.fillStyle = 'black';
+    // this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
     requestAnimationFrame(this.animate);
   }
@@ -37,8 +38,9 @@ export class Game {
     this.lastTime = currentTime;
 
     // clear
-    this.ctx.fillStyle = "black";
-    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    // this.ctx.fillStyle = 'black';
+    // this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
     for (let enemy of this.enemies) {
       enemy.run(this.ctx, deltaTimeSeconds);

@@ -9,3 +9,10 @@ html, body {
   height: 100%;
   overflow: hidden;
 }
+
+#bgcanvas {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: -1;
+}
