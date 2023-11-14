@@ -88,7 +88,7 @@ export class Player implements GameObject {
 
   update(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number) {
     if (this.input.up) {
-      this.applyPropulsionForce(deltaTimeSeconds);
+      this.applyPropulsionForce();
       this.buttParticles.active = true;
     } else {
       this.buttParticles.active = false;
@@ -110,7 +110,7 @@ export class Player implements GameObject {
       this.rotation += this.rotationSpeed * deltaTimeSeconds;
     }
 
-    this.velocity.add(this.acceleration);
+    this.velocity.add(Vector2.scale(this.acceleration, deltaTimeSeconds));
     if (this.velocity.getMagnitude() > this.maxVelocity) {
       this.velocity.setMagnitude(this.maxVelocity);
     }
@@ -189,9 +189,9 @@ export class Player implements GameObject {
     return Vector2.distanceBetween(q, enemy.position) <= enemy.radius;
   }
 
-  private applyPropulsionForce(deltaTimeSeconds: number): void {
+  private applyPropulsionForce(): void {
     const force = Vector2.fromAngle(this.rotation);
-    force.scale(this.propulsionForce * deltaTimeSeconds);
+    force.scale(this.propulsionForce);
     this.acceleration.add(force);
   }
 
