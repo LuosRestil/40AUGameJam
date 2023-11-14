@@ -1,4 +1,5 @@
 import { Enemy } from "./Enemy";
+import { Missile } from "./Missile";
 import { Player } from "./Player";
 import { Splat } from "./Splat";
 import { Vector2 } from "./Vector2";
@@ -8,6 +9,7 @@ export class Game {
   player: Player;
   enemies: Enemy[] = [];
   splats: Splat[] = [];
+  missiles: Missile[] = [];
   lastTime: number = 0;
   score: number = 0;
   level: number = 1;
@@ -18,8 +20,8 @@ export class Game {
     this.player = new Player(this);
     this.spawnEnemies();
 
-    document.addEventListener('keydown', (evt) => {
-      if (this.gameOver && evt.key === 'r') {
+    document.addEventListener("keydown", (evt) => {
+      if (this.gameOver && evt.key === "r") {
         this.refresh();
       }
     });
@@ -27,8 +29,6 @@ export class Game {
 
   run() {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    // this.ctx.fillStyle = 'black';
-    // this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
     requestAnimationFrame(this.animate);
   }
@@ -44,6 +44,11 @@ export class Game {
       enemy.run(this.ctx, deltaTimeSeconds);
     }
     this.enemies = this.enemies.filter((enemy) => enemy.active);
+
+    for (let missile of this.missiles) {
+      missile.run(this.ctx, deltaTimeSeconds);
+    }
+    this.missiles = this.missiles.filter((missile) => missile.active);
 
     for (let splat of this.splats) {
       splat.run(this.ctx, deltaTimeSeconds);
@@ -74,7 +79,7 @@ export class Game {
         this.ctx.canvas.height / 2
       );
       this.player.velocity = new Vector2(0, 0);
-      this.player.missiles = [];
+      this.missiles = [];
     }
 
     requestAnimationFrame(this.animate);
@@ -123,8 +128,16 @@ export class Game {
     this.ctx.fillStyle = "white";
     this.ctx.strokeStyle = "black";
     this.ctx.font = "48px monospace";
-    this.ctx.strokeText("Press \"R\" to play again", this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 50);
-    this.ctx.fillText("Press \"R\" to play again", this.ctx.canvas.width / 2, this.ctx.canvas.height / 2 + 50);
+    this.ctx.strokeText(
+      'Press "R" to play again',
+      this.ctx.canvas.width / 2,
+      this.ctx.canvas.height / 2 + 50
+    );
+    this.ctx.fillText(
+      'Press "R" to play again',
+      this.ctx.canvas.width / 2,
+      this.ctx.canvas.height / 2 + 50
+    );
   }
 
   private detectPlayerEnemyCollisions(): void {
@@ -153,7 +166,7 @@ export class Game {
   }
 
   private detectMissileEnemyCollisions(): void {
-    for (let missile of this.player.missiles) {
+    for (let missile of this.missiles) {
       for (let enemy of this.enemies) {
         const collisionDetected = missile.collidesWith(enemy);
         if (collisionDetected) {
@@ -203,7 +216,10 @@ export class Game {
     this.score = 0;
     this.level = 1;
     this.spawnEnemies();
-    this.player.position = new Vector2(this.ctx.canvas.width/2, this.ctx.canvas.height/2);
+    this.player.position = new Vector2(
+      this.ctx.canvas.width / 2,
+      this.ctx.canvas.height / 2
+    );
     this.player.velocity = new Vector2(0, 0);
     this.gameOver = false;
   }

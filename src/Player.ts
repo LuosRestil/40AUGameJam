@@ -28,7 +28,6 @@ export class Player implements GameObject {
     right: false,
   };
   missileSpeed: number = 200;
-  missiles: Missile[] = [];
   propulsionForce: number = 1000;
   game: Game;
   lives: number = 1;
@@ -80,10 +79,6 @@ export class Player implements GameObject {
   run(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number): void {
     this.update(ctx, deltaTimeSeconds);
     this.draw(ctx);
-    this.missiles = this.missiles.filter(missile => missile.active);
-    for (const missile of this.missiles) {
-      missile.run(ctx, deltaTimeSeconds);
-    }
   }
 
   update(ctx: CanvasRenderingContext2D, deltaTimeSeconds: number) {
@@ -210,7 +205,7 @@ export class Player implements GameObject {
       .scale(this.width / 2)
       .add(this.position);
 
-    this.missiles.push(
+    this.game.missiles.push(
       new Missile(nosePos, Vector2.scale(forward, this.missileSpeed))
     );
   }
