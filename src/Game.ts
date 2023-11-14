@@ -10,7 +10,7 @@ export class Game {
   splats: Splat[] = [];
   lastTime: number = 0;
   score: number = 0;
-  level: number = 5;
+  level: number = 1;
   gameOver: boolean = false;
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -39,8 +39,6 @@ export class Game {
 
     // clear
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    // this.ctx.fillStyle = 'black';
-    // this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
     for (let enemy of this.enemies) {
       enemy.run(this.ctx, deltaTimeSeconds);
