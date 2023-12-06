@@ -3,9 +3,6 @@ import { Vector2 } from "./Vector2";
 class SplatParticle {
   position: Vector2;
   velocity: Vector2;
-  lifetime: number = 1;
-  elapsed: number = 0;
-  active: boolean = true;
 
   constructor(position: Vector2, velocity: Vector2) {
     this.position = position;

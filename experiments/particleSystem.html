@@ -68,7 +68,7 @@
         size;
         shape;
 
-        constructor(position, velocity, size, shape, lifetime, createdTime) {
+        constructor(position, velocity, size, lifetime, createdTime) {
           this.position = position;
           this.velocity = velocity;
           this.lifetime = lifetime;
@@ -78,7 +78,6 @@
           const randIdx = Math.floor(Math.random() * colors.length);
           this.color = colors[randIdx];
           this.size = size;
-          this.shape = shape;
         }
 
         run(timestamp, windForce) {
@@ -153,7 +152,6 @@
                 y: this.minVel + Math.random() * (this.maxVel - this.minVel),
               },
               5,
-              "square",
               1000, // 1 second
               timestamp,
             )

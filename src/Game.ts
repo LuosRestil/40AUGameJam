@@ -14,11 +14,20 @@ export class Game {
   score: number = 0;
   level: number = 1;
   gameOver: boolean = false;
+  // mainSong: HTMLAudioElement = new Audio("game_song.mp3");
+  // levelUpSound: HTMLAudioElement = new Audio("lvlup1.wav");
+  levelUpSound: HTMLAudioElement = new Audio('lvlup2.mp3');
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.player = new Player(this);
     this.spawnEnemies();
+
+    // this.mainSong.loop = true;
+    // this.mainSong.volume = 0.5;
+    // this.mainSong.play();
+
+    this.levelUpSound.preload = "auto";
 
     document.addEventListener("keydown", (evt) => {
       if (this.gameOver && evt.key === "r") {
@@ -72,6 +81,7 @@ export class Game {
     }
 
     if (!this.enemies.length) {
+      this.levelUpSound.play();
       this.level++;
       this.spawnEnemies();
       this.player.position = new Vector2(
@@ -86,7 +96,7 @@ export class Game {
   };
 
   private showScore(): void {
-    // TODO style, ensure score can't overflow
+    // TODO style
     // https://stackoverflow.com/questions/40199805/unable-to-use-a-google-font-on-canvas
     // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font
     this.ctx.fillStyle = "white";
@@ -175,6 +185,7 @@ export class Game {
           missile.active = false;
           enemy.requiredHits--;
           if (enemy.requiredHits === 0) {
+            enemy.pop();
             if (enemy.stage < 3) {
               this.enemies.push(
                 new Enemy(
@@ -191,11 +202,14 @@ export class Game {
                 )
               );
             } else {
+              enemy.splat();
               this.splats.push(
                 new Splat(enemy.position.copy(), "limegreen", "green")
               );
             }
             enemy.active = false;
+          } else {
+            enemy.ding();
           }
         }
       }

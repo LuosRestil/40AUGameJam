@@ -16,6 +16,9 @@ export class Enemy implements GameObject {
     fill: ["limegreen", "violet", "crimson"],
     stroke: ["green", "rebeccapurple", "firebrick"],
   };
+  popSound: HTMLAudioElement = new Audio('pop.mp3');
+  dingSound: HTMLAudioElement = new Audio('ding.ogg');
+  splatSound: HTMLAudioElement = new Audio('splat.wav');
 
   constructor(origin: Vector2, stage: number, scale: number) {
     this.position = origin;
@@ -25,6 +28,9 @@ export class Enemy implements GameObject {
     this.velocity = Vector2.unitFromAngle(Math.random() * Math.PI * 2).scale(
       Math.random() * (this.maxVel - this.minVel) + this.minVel
     );
+    this.popSound.preload = 'auto';
+    this.dingSound.preload = 'auto';
+    this.splatSound.preload = 'auto';
     const rand = Math.random();
     if (rand > 0.2) this.requiredHits = 1;
     else if (rand > 0.05) this.requiredHits = 2;
@@ -118,5 +124,22 @@ export class Enemy implements GameObject {
       Math.PI * 2
     );
     ctx.fill();
+  }
+
+  ding(): void {
+    if (!this.dingSound.paused) {
+      this.dingSound.currentTime = 0; // Restart the sound if it is playing
+    }
+    this.dingSound.play();
+  }
+
+  pop(): void {
+    // this.dingSound.pause();
+    this.popSound.play();
+  }
+
+  splat(): void {
+    // this.popSound.pause();
+    this.splatSound.play();
   }
 }

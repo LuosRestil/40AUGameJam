@@ -31,6 +31,7 @@ export class Player implements GameObject {
   propulsionForce: number = 1000;
   game: Game;
   lives: number = 1;
+  fireSound: HTMLAudioElement = new Audio('laser2.wav');
 
   constructor(game: Game) {
     this.game = game;
@@ -43,6 +44,7 @@ export class Player implements GameObject {
     this.rotation = 0;
     this.maxVelocity = 800;
     this.buttParticles = new ButtParticleSystem();
+    this.fireSound.preload = 'auto';
 
     document.addEventListener("keydown", (evt: KeyboardEvent) => {
       if (this.game.gameOver) return;
@@ -191,6 +193,11 @@ export class Player implements GameObject {
   }
 
   private fire(): void {
+    if (!this.fireSound.paused) {
+      this.fireSound.currentTime = 0; // Restart the sound if it is playing
+    }
+    this.fireSound.play();
+
     if (this.game.score > 0) this.game.score -= 1;
 
     // find nose position
