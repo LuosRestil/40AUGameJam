@@ -14,20 +14,26 @@ export class Game {
   score: number = 0;
   level: number = 1;
   gameOver: boolean = false;
-  // mainSong: HTMLAudioElement = new Audio("game_song.mp3");
-  // levelUpSound: HTMLAudioElement = new Audio("lvlup1.wav");
-  levelUpSound: HTMLAudioElement = new Audio('lvlup2.mp3');
+  mainSong: HTMLAudioElement = new Audio("main-song.ogg");
+  levelUpSound: HTMLAudioElement = new Audio('level-up.mp3');
+  playerDeathSound: HTMLAudioElement = new Audio('player-death-2.wav');
+  gameOverSong: HTMLAudioElement = new Audio('game-over-1.wav');
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.player = new Player(this);
     this.spawnEnemies();
 
-    // this.mainSong.loop = true;
-    // this.mainSong.volume = 0.5;
-    // this.mainSong.play();
+    this.mainSong.loop = true;
+    this.mainSong.volume = 0.4;
+    this.mainSong.play();
 
     this.levelUpSound.preload = "auto";
+    this.playerDeathSound.preload = "auto";
+    this.gameOverSong.preload = "auto";
+    this.gameOverSong.volume = 0.5;
+    this.playerDeathSound.volume = 0.5;
+
 
     document.addEventListener("keydown", (evt) => {
       if (this.gameOver && evt.key === "r") {
@@ -159,12 +165,17 @@ export class Game {
     }
     // TODO destroy player, spend lives, handle game over
     if (collisionDetected) {
+      this.playerDeathSound.play();
       this.splats.push(
         new Splat(this.player.position.copy(), "crimson", "darkred")
       );
       this.player.lives--;
       if (this.player.lives < 1) {
+        this.mainSong.pause();
+        this.mainSong.currentTime = 0;
+        this.gameOverSong.play();
         this.gameOver = true;
+        this.player.killSound();
       } else {
         this.player.position = new Vector2(
           this.ctx.canvas.width / 2,
@@ -236,5 +247,8 @@ export class Game {
     );
     this.player.velocity = new Vector2(0, 0);
     this.gameOver = false;
+    this.gameOverSong.pause();
+    this.gameOverSong.currentTime = 0;
+    this.mainSong.play();
   }
 }

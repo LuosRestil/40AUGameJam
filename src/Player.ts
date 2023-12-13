@@ -31,7 +31,8 @@ export class Player implements GameObject {
   propulsionForce: number = 1000;
   game: Game;
   lives: number = 1;
-  fireSound: HTMLAudioElement = new Audio('laser2.wav');
+  fireSound: HTMLAudioElement = new Audio("laser.wav");
+  sparkleSound: HTMLAudioElement = new Audio("sparkle2.wav");
 
   constructor(game: Game) {
     this.game = game;
@@ -44,7 +45,10 @@ export class Player implements GameObject {
     this.rotation = 0;
     this.maxVelocity = 800;
     this.buttParticles = new ButtParticleSystem();
-    this.fireSound.preload = 'auto';
+    
+    this.fireSound.preload = "auto";
+    this.sparkleSound.preload = "auto";
+    this.sparkleSound.loop = true;
 
     document.addEventListener("keydown", (evt: KeyboardEvent) => {
       if (this.game.gameOver) return;
@@ -87,8 +91,13 @@ export class Player implements GameObject {
     if (this.input.up) {
       this.applyPropulsionForce();
       this.buttParticles.active = true;
+      if (this.sparkleSound.paused) {
+        this.sparkleSound.play();
+      }
     } else {
       this.buttParticles.active = false;
+      this.sparkleSound.pause();
+      this.sparkleSound.currentTime = 0;
     }
 
     // calculate butt position
@@ -111,9 +120,7 @@ export class Player implements GameObject {
     if (this.velocity.getMagnitude() > this.maxVelocity) {
       this.velocity.setMagnitude(this.maxVelocity);
     }
-    this.position.add(
-      Vector2.scale(this.velocity, deltaTimeSeconds)
-    );
+    this.position.add(Vector2.scale(this.velocity, deltaTimeSeconds));
     this.acceleration.scale(0);
     screenWrap(this, ctx);
   }
@@ -215,5 +222,10 @@ export class Player implements GameObject {
     this.game.missiles.push(
       new Missile(nosePos, Vector2.scale(forward, this.missileSpeed))
     );
+  }
+
+  killSound(): void {
+    this.sparkleSound.pause();
+    this.sparkleSound.currentTime = 0;
   }
 }

@@ -134,12 +134,10 @@ export class Enemy implements GameObject {
   }
 
   pop(): void {
-    // this.dingSound.pause();
     this.popSound.play();
   }
 
   splat(): void {
-    // this.popSound.pause();
     this.splatSound.play();
   }
 }

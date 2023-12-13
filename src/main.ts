@@ -4,10 +4,10 @@ import { Game } from './Game';
 document.addEventListener('keydown', startGame);
 
 const titleScreen = document.getElementById("title-screen") as HTMLDivElement;
-const mainSong: HTMLAudioElement = new Audio("game_song.mp3");
-mainSong.loop = true;
-mainSong.volume = 0.5;
-mainSong.play();
+const introSong: HTMLAudioElement = new Audio("intro-song.mp3");
+introSong.loop = true;
+introSong.volume = 0.5;
+introSong.play();
 
 function startGame(evt: KeyboardEvent) {
   if (evt.key === 'r') {
@@ -21,6 +21,7 @@ function startGame(evt: KeyboardEvent) {
     new Game(ctx).run();
   
     document.removeEventListener('keydown', startGame);
+    introSong.pause();
   }
 }
 
